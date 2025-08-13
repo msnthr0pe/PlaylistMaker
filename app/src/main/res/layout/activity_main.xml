@@ -23,10 +23,12 @@
     </FrameLayout>
 
     <Button
+        android:id="@+id/search_btn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:backgroundTint="@color/white"
+        android:foreground="?attr/selectableItemBackground"
         app:icon="@drawable/ic_search"
         app:iconTint="@color/dark_blue"
         app:iconGravity="textStart"
@@ -41,10 +43,12 @@
         android:layout_marginHorizontal="@dimen/small_margin"/>
 
     <Button
+        android:id="@+id/media_btn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:backgroundTint="@color/white"
+        android:foreground="?attr/selectableItemBackground"
         app:icon="@drawable/ic_media"
         app:iconTint="@color/dark_blue"
         app:iconGravity="textStart"
@@ -59,10 +63,12 @@
         android:layout_marginHorizontal="@dimen/small_margin"/>
 
     <Button
+        android:id="@+id/settings_btn"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:backgroundTint="@color/white"
+        android:foreground="?attr/selectableItemBackground"
         app:icon="@drawable/ic_settings"
         app:iconTint="@color/dark_blue"
         app:iconGravity="textStart"
