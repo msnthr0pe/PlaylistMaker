@@ -1,15 +1,31 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <style name="Base.Theme.PlaylistMaker" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:textViewStyle">@style/TextView</item>
         <item name="materialButtonStyle">@style/ButtonStyle</item>
+
+        <item name="titleScreenBackground">@color/blue</item>
+        <item name="genericScreenBackground">@color/white</item>
+        <item name="genericTextColor">@color/yp_black</item>
+        <item name="settingsIconColor">@color/gray</item>
     </style>
 
     <style name="TextView" parent="Widget.MaterialComponents.TextView">
         <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textColor">?attr/genericTextColor</item>
+        <item name="android:textSize">@dimen/title_size</item>
     </style>
 
     <style name="ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:textSize">@dimen/title_size</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textColor">@color/yp_black</item>
+        <item name="cornerRadius">@dimen/corner_radius</item>
+        <item name="android:insetTop">@dimen/default_inset</item>
+        <item name="android:insetBottom">@dimen/default_inset</item>
     </style>
 
     <style name="Theme.PlaylistMaker" parent="Base.Theme.PlaylistMaker" />
