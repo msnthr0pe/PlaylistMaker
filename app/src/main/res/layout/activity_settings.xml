@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="?attr/genericScreenBackground"
     android:orientation="vertical">
 
     <FrameLayout
@@ -13,23 +14,22 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/back_settings_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/title_margin"
+                android:padding="@dimen/title_margin"
                 android:src="@drawable/ic_back"
-                app:tint="@color/black" />
+                app:tint="?attr/genericTextColor" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/settings"
-                android:textColor="@color/black"
                 android:textSize="@dimen/title_size"
                 android:layout_marginTop="@dimen/top_margin"
-                android:layout_marginStart="@dimen/title_margin"
-                />
+                android:layout_marginStart="@dimen/title_margin" />
         </LinearLayout>
 
     </FrameLayout>
@@ -46,21 +46,23 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/night_theme"
-            android:textColor="@color/black"
             android:textSize="@dimen/regular_size"
             android:layout_marginStart="@dimen/small_margin"
             android:layout_marginVertical="@dimen/vertical_settings_margin"/>
 
         <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/dark_theme_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"/>
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/share_app_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical">
 
         <TextView
@@ -68,7 +70,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/share_contact"
-            android:textColor="@color/black"
             android:textSize="@dimen/regular_size"
             android:layout_marginStart="@dimen/small_margin"
             android:layout_marginVertical="@dimen/vertical_settings_margin"/>
@@ -81,9 +82,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/contact_support_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <TextView
@@ -93,7 +96,6 @@
             android:layout_marginStart="@dimen/small_margin"
             android:layout_weight="1"
             android:text="@string/contact_support"
-            android:textColor="@color/black"
             android:textSize="@dimen/regular_size" />
 
         <ImageView
@@ -104,9 +106,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/user_agreement_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical">
 
         <TextView
@@ -114,7 +118,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/user_agreement"
-            android:textColor="@color/black"
             android:textSize="@dimen/regular_size"
             android:layout_marginStart="@dimen/small_margin"
             android:layout_marginVertical="@dimen/vertical_settings_margin"/>
