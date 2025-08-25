@@ -5,13 +5,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+
 
 class SearchActivity : AppCompatActivity() {
 
@@ -24,12 +22,14 @@ class SearchActivity : AppCompatActivity() {
         val searchField = findViewById<EditText>(R.id.search_et)
         val clearBtn = findViewById<ImageView>(R.id.clear_text_btn)
 
-        if (savedInstanceState != null) {
-            searchField.setText(savedInstanceState.getString(TEXT_KEY, DEFAULT_TEXT))
-        }
-
         clearBtn.setOnClickListener {
             searchField.setText("")
+
+            val view = this.currentFocus
+            if (view != null) {
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(view.windowToken, 0)
+            }
         }
 
         clearBtn.visibility = View.GONE
@@ -55,6 +55,7 @@ class SearchActivity : AppCompatActivity() {
             ) {
                 if (searchField.text.isNotEmpty()) {
                     clearBtn.visibility = View.VISIBLE
+                    searchText = searchField.text.toString()
                 } else {
                     clearBtn.visibility = View.GONE
                 }
@@ -69,9 +70,14 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val t = findViewById<EditText>(R.id.search_et)
-        searchText = t.text.toString()
         outState.putString(TEXT_KEY, searchText)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        findViewById<EditText>(R.id.search_et)
+            .setText(savedInstanceState.getString(TEXT_KEY, DEFAULT_TEXT))
     }
 
     companion object {
