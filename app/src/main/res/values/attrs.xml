@@ -4,5 +4,7 @@
     <attr name="genericScreenBackground" format="color"/>
     <attr name="genericTextColor" format="color"/>
     <attr name="settingsIconColor" format="color"/>
+    <attr name="searchHintColor" format="color"/>
+    <attr name="searchBackgroundColor" format="color"/>
 
 </resources>

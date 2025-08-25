@@ -14,11 +14,12 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/back_settings_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/title_margin"
+                android:padding="@dimen/title_margin"
                 android:src="@drawable/ic_back"
                 app:tint="?attr/genericTextColor" />
 
