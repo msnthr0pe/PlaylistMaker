@@ -68,4 +68,13 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/test_tv"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="TEST"
+        android:gravity="center"/>
+
+
 </LinearLayout>

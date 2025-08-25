@@ -7,18 +7,26 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class SearchActivity : AppCompatActivity() {
+
+    private var searchText = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
 
         val searchField = findViewById<EditText>(R.id.search_et)
         val clearBtn = findViewById<ImageView>(R.id.clear_text_btn)
+
+        if (savedInstanceState != null) {
+            searchField.setText(savedInstanceState.getString(TEXT_KEY, DEFAULT_TEXT))
+        }
 
         clearBtn.setOnClickListener {
             searchField.setText("")
@@ -57,5 +65,17 @@ class SearchActivity : AppCompatActivity() {
         }
 
         searchField.addTextChangedListener(textWatcher)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val t = findViewById<EditText>(R.id.search_et)
+        searchText = t.text.toString()
+        outState.putString(TEXT_KEY, searchText)
+    }
+
+    companion object {
+        const val TEXT_KEY = "TEXT"
+        const val DEFAULT_TEXT = ""
     }
 }
