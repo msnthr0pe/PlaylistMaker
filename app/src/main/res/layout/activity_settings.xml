@@ -57,9 +57,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/share_app_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical">
 
         <TextView
@@ -79,9 +81,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/contact_support_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
         android:orientation="horizontal">
 
         <TextView
@@ -101,9 +105,11 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/user_agreement_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:background="?attr/selectableItemBackground"
         android:gravity="center_vertical">
 
         <TextView
