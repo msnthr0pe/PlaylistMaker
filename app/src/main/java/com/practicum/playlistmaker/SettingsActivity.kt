@@ -19,11 +19,11 @@ class SettingsActivity : AppCompatActivity() {
 
         val darkThemeSwitch = findViewById<SwitchCompat>(R.id.dark_theme_switch)
 
-        //Не могу догадаться, как сделать рабочий переключатель темы. Проблема в том,
-        //что при переключении на другую активность и обратно переключатель становится
-        //в неправильное положение относительно включённой тёмной темы, а при попытке
-        //программно поставить его в это положение возникает бесконечный цикл с бесконечной
-        //сменой тем
+        //Из-за двух вызовов активити опять происходят баги с темой
+        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+                darkThemeSwitch.isChecked = true
+        }
+
         darkThemeSwitch.setOnCheckedChangeListener { _, isNightTheme ->
             Log.d("themeInfo", "$isNightTheme")
             if (isNightTheme) {
@@ -33,7 +33,7 @@ class SettingsActivity : AppCompatActivity() {
             }
         }
         findViewById<ImageView>(R.id.back_settings_btn).setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
 
         findViewById<LinearLayout>(R.id.share_app_btn).setOnClickListener {

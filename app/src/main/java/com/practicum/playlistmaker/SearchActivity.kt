@@ -9,6 +9,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
+import androidx.core.widget.doOnTextChanged
 
 
 class SearchActivity : AppCompatActivity() {
@@ -24,6 +26,8 @@ class SearchActivity : AppCompatActivity() {
 
         clearBtn.setOnClickListener {
             searchField.setText("")
+            
+            searchText = ""
 
             val view = this.currentFocus
             if (view != null) {
@@ -35,37 +39,17 @@ class SearchActivity : AppCompatActivity() {
         clearBtn.visibility = View.GONE
 
         findViewById<ImageView>(R.id.back_search_btn).setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
 
-        val textWatcher = object : TextWatcher {
-
-            override fun beforeTextChanged(
-                p0: CharSequence?,
-                p1: Int,
-                p2: Int,
-                p3: Int,
-            ) {}
-
-            override fun onTextChanged(
-                p0: CharSequence?,
-                p1: Int,
-                p2: Int,
-                p3: Int,
-            ) {
-                if (searchField.text.isNotEmpty()) {
-                    clearBtn.visibility = View.VISIBLE
-                    searchText = searchField.text.toString()
-                } else {
-                    clearBtn.visibility = View.GONE
-                }
+        searchField.doOnTextChanged { _, _, _, _ ->
+            if (searchField.text.isNotEmpty()) {
+                clearBtn.isVisible = true
+                searchText = searchField.text.toString()
+            } else {
+                clearBtn.isVisible = false
             }
-
-            override fun afterTextChanged(p0: Editable?) {}
-
         }
-
-        searchField.addTextChangedListener(textWatcher)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
