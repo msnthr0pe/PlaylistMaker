@@ -4,13 +4,10 @@
         <item name="materialButtonStyle">@style/ButtonStyle</item>
         <item name="editTextStyle">@style/EditText</item>
 
-        <item name="titleScreenBackground">@color/yp_black</item>
         <item name="genericScreenBackground">@color/yp_black</item>
         <item name="genericTextColor">@color/white</item>
-        <item name="settingsIconColor">@color/white</item>
         <item name="searchHintColor">@color/yp_black</item>
         <item name="searchBackgroundColor">@color/white</item>
-
     </style>
 
     <style name="TextView" parent="Widget.MaterialComponents.TextView">

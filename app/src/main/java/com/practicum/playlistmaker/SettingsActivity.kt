@@ -1,12 +1,10 @@
 package com.practicum.playlistmaker
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
@@ -36,14 +34,14 @@ class SettingsActivity : AppCompatActivity() {
             finish()
         }
 
-        findViewById<LinearLayout>(R.id.share_app_btn).setOnClickListener {
+        findViewById<Button>(R.id.share_app_btn).setOnClickListener {
             val intent = Intent(Intent.ACTION_SEND)
             intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.course_link))
             intent.type = "text/plain"
             startActivity(Intent.createChooser(intent, null))
         }
 
-        findViewById<LinearLayout>(R.id.contact_support_btn).setOnClickListener {
+        findViewById<Button>(R.id.contact_support_btn).setOnClickListener {
             val intent = Intent(Intent.ACTION_SENDTO)
             intent.data = "mailto:".toUri()
             intent.putExtra(Intent.EXTRA_EMAIL, arrayOf(getString(R.string.my_email)))
@@ -52,7 +50,7 @@ class SettingsActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
-        findViewById<LinearLayout>(R.id.user_agreement_btn).setOnClickListener {
+        findViewById<Button>(R.id.user_agreement_btn).setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, getString(R.string.legal_link).toUri()))
         }
     }

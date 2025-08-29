@@ -4,10 +4,8 @@
         <item name="materialButtonStyle">@style/ButtonStyle</item>
         <item name="editTextStyle">@style/EditText</item>
 
-        <item name="titleScreenBackground">@color/blue</item>
         <item name="genericScreenBackground">@color/white</item>
         <item name="genericTextColor">@color/yp_black</item>
-        <item name="settingsIconColor">@color/gray</item>
         <item name="searchHintColor">@color/gray</item>
         <item name="searchBackgroundColor">@color/yp_light_gray</item>
     </style>
