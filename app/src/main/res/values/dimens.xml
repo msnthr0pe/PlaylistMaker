@@ -4,7 +4,8 @@
     <dimen name="regular_size">16sp</dimen>
     <dimen name="small_size">11sp</dimen>
     <dimen name="vertical_settings_margin">21dp</dimen>
-    <dimen name="small_margin">16dp</dimen>
+    <dimen name="medium_margin">16dp</dimen>
+    <dimen name="small_margin">8dp</dimen>
     <dimen name="small_icon">16dp</dimen>
     <dimen name="title_margin">12dp</dimen>
     <dimen name="icons_end_margin">12dp</dimen>

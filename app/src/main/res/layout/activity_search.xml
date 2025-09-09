@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/corners"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="@dimen/small_margin"
+        android:layout_marginHorizontal="@dimen/medium_margin"
         android:layout_marginTop="4dp">
 
         <ImageView
@@ -74,7 +74,7 @@
         android:id="@+id/search_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/medium_margin"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         android:orientation="vertical"
         tools:listitem="@layout/item_search"/>

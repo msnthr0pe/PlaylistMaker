@@ -11,7 +11,7 @@
         android:layout_height="45dp"
         android:src="@drawable/poster"
         android:scaleType="centerCrop"
-        android:layout_marginVertical="8dp"
+        android:layout_marginVertical="@dimen/small_margin"
         android:layout_marginStart="13dp" />
     
     <LinearLayout
@@ -20,13 +20,15 @@
         android:layout_weight="1"
         android:orientation="vertical"
         android:layout_gravity="center"
-        android:layout_marginStart="8dp">
+        android:layout_marginStart="@dimen/small_margin">
 
         <TextView
             android:id="@+id/search_song_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="?attr/genericTextColor"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="@string/default_value"/>
 
         <LinearLayout
@@ -36,9 +38,11 @@
 
             <TextView
                 android:id="@+id/search_artist_name"
-                android:textAppearance="@style/GrayTextView"
+                android:textAppearance="@style/TrackInfoTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="@string/default_value" />
 
             <ImageView
@@ -49,9 +53,10 @@
 
             <TextView
                 android:id="@+id/search_song_duration"
-                android:textAppearance="@style/GrayTextView"
+                android:textAppearance="@style/TrackInfoTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxLines="1"
                 android:text="@string/default_time"/>
 
         </LinearLayout>

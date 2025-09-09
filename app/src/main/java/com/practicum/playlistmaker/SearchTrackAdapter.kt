@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 
 class SearchTrackAdapter(val tracks: List<Track>) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
 
@@ -20,6 +22,12 @@ class SearchTrackAdapter(val tracks: List<Track>) : RecyclerView.Adapter<SearchT
             trackNameText.text = track.trackName
             artistNameText.text = track.artistName
             trackTime.text = track.trackTime
+            Glide.with(itemView.context)
+                .load(track.artworkUrl100)
+                .centerCrop()
+                .transform(RoundedCorners(6))
+                .placeholder(R.drawable.ic_placeholder)
+                .into(artworkUrlImage)
         }
     }
 

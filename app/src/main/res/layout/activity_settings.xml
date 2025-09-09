@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/genericScreenBackground"
     android:orientation="vertical"
@@ -49,7 +50,7 @@
             android:layout_weight="1"
             android:text="@string/night_theme"
             android:textSize="@dimen/regular_size"
-            android:layout_marginStart="@dimen/small_margin"
+            android:layout_marginStart="@dimen/medium_margin"
             android:layout_marginVertical="@dimen/vertical_settings_margin"/>
 
         <androidx.appcompat.widget.SwitchCompat
@@ -68,7 +69,7 @@
         app:icon="@drawable/ic_share"
         app:iconGravity="end"
         app:iconPadding="@dimen/icons_end_margin"
-        app:iconTint="?attr/arrowIconColor"/>
+        app:iconTint="?attr/iconColor"/>
 
     <Button
         android:id="@+id/contact_support_btn"
@@ -79,7 +80,7 @@
         app:icon="@drawable/ic_support"
         app:iconGravity="end"
         app:iconPadding="@dimen/icons_end_margin"
-        app:iconTint="?attr/arrowIconColor"/>
+        app:iconTint="?attr/iconColor"/>
 
     <Button
         android:id="@+id/user_agreement_btn"
@@ -90,6 +91,6 @@
         app:icon="@drawable/ic_arrow"
         app:iconGravity="end"
         app:iconPadding="@dimen/icons_end_margin"
-        app:iconTint="?attr/arrowIconColor"/>
+        app:iconTint="?attr/iconColor"/>
 
 </LinearLayout>

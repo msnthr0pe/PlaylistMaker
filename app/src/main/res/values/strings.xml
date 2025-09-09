@@ -12,4 +12,6 @@
     <string name="my_email">pavlid99@gmail.com</string>
     <string name="legal_link">https://yandex.ru/legal/practicum_offer/ru/</string>
     <string name="course_link">https://practicum.yandex.ru/android-developer/?from=catalog</string>
+    <string name="default_value">default</string>
+    <string name="default_time">0:00</string>
 </resources>

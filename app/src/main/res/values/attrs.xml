@@ -3,7 +3,7 @@
     <attr name="titleScreenBackground" format="color"/>
     <attr name="genericScreenBackground" format="color"/>
     <attr name="genericTextColor" format="color"/>
-    <attr name="arrowIconColor" format="color"/>
+    <attr name="iconColor" format="color"/>
     <attr name="searchHintColor" format="color"/>
     <attr name="searchBackgroundColor" format="color"/>
 
