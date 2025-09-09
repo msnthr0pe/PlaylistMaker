@@ -68,7 +68,7 @@
         app:icon="@drawable/ic_share"
         app:iconGravity="end"
         app:iconPadding="@dimen/icons_end_margin"
-        app:iconTint="?attr/settingsIconColor"/>
+        app:iconTint="?attr/arrowIconColor"/>
 
     <Button
         android:id="@+id/contact_support_btn"
@@ -79,7 +79,7 @@
         app:icon="@drawable/ic_support"
         app:iconGravity="end"
         app:iconPadding="@dimen/icons_end_margin"
-        app:iconTint="?attr/settingsIconColor"/>
+        app:iconTint="?attr/arrowIconColor"/>
 
     <Button
         android:id="@+id/user_agreement_btn"
@@ -90,6 +90,6 @@
         app:icon="@drawable/ic_arrow"
         app:iconGravity="end"
         app:iconPadding="@dimen/icons_end_margin"
-        app:iconTint="?attr/settingsIconColor"/>
+        app:iconTint="?attr/arrowIconColor"/>
 
 </LinearLayout>

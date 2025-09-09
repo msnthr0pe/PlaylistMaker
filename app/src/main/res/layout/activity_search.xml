@@ -38,7 +38,7 @@
         android:background="@drawable/corners"
         android:orientation="horizontal"
         android:layout_marginHorizontal="@dimen/small_margin"
-        android:layout_marginVertical="8dp">
+        android:layout_marginTop="4dp">
 
         <ImageView
             android:layout_width="@dimen/small_icon"
@@ -64,8 +64,19 @@
             android:layout_height="match_parent"
             android:src="@drawable/ic_cancel"
             android:layout_gravity="center_vertical"
-            android:paddingHorizontal="12dp" />
+            android:paddingHorizontal="12dp"
+            app:tint="?attr/searchHintColor"/>
 
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:theme="@style/SearchRecyclerStyle"
+        android:id="@+id/search_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="16dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:orientation="vertical"
+        tools:listitem="@layout/item_search"/>
 
 </LinearLayout>

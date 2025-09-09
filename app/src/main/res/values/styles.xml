@@ -29,11 +29,10 @@
     <style name="SettingsScreenStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="genericScreenBackground">@color/white</item>
         <item name="genericTextColor">@color/yp_black</item>
-        <item name="settingsIconColor">@color/gray</item>
+        <item name="arrowIconColor">@color/gray</item>
 
         <item name="materialButtonStyle">@style/SettingsButtonStyle</item>
         <item name="android:textViewStyle">@style/BaseTextView</item>
-
     </style>
 
     <style name="SettingsButtonStyle" parent="Widget.MaterialComponents.Button.UnelevatedButton">
@@ -60,6 +59,26 @@
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textSize">@dimen/title_size</item>
         <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="RegularTextView" parent="BaseTextView">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/yp_black</item>
+    </style>
+
+    <style name="GrayTextView" parent="BaseTextView">
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/small_size</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="SearchRecyclerStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="genericScreenBackground">@color/white</item>
+        <item name="arrowIconColor">@color/gray</item>
+        <item name="genericTextColor">@color/yp_black</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
     </style>
 
 </resources>
