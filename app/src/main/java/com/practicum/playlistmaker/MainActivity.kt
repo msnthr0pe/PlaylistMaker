@@ -19,11 +19,8 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        val itemClickListener: View.OnClickListener = object : View.OnClickListener{override fun onClick(v: View?)
-        {
-            startActivity(Intent(this@MainActivity, SearchActivity::class.java))
-        }
-        }
+        val itemClickListener: View.OnClickListener =
+            View.OnClickListener { startActivity(Intent(this@MainActivity, SearchActivity::class.java)) }
 
         val searchBtn = findViewById<Button>(R.id.search_btn).setOnClickListener(itemClickListener)
         val mediaBtn = findViewById<Button>(R.id.media_btn).setOnClickListener {
