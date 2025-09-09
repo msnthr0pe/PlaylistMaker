@@ -2,8 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
+    android:background="?attr/genericScreenBackground"
+    android:orientation="vertical"
+    android:theme="@style/SettingsScreenStyle">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -13,23 +16,23 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
+
             <ImageView
                 android:id="@+id/back_settings_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/title_margin"
+                android:padding="@dimen/title_margin"
                 android:src="@drawable/ic_back"
-                app:tint="@color/black" />
+                app:tint="?attr/genericTextColor" />
 
             <TextView
+                android:textAppearance="@style/TitleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/settings"
-                android:textColor="@color/black"
                 android:textSize="@dimen/title_size"
                 android:layout_marginTop="@dimen/top_margin"
-                android:layout_marginStart="@dimen/title_margin"
-                />
+                android:layout_marginStart="@dimen/title_margin" />
         </LinearLayout>
 
     </FrameLayout>
@@ -46,84 +49,48 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/night_theme"
-            android:textColor="@color/black"
             android:textSize="@dimen/regular_size"
-            android:layout_marginStart="@dimen/small_margin"
+            android:layout_marginStart="@dimen/medium_margin"
             android:layout_marginVertical="@dimen/vertical_settings_margin"/>
 
         <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/dark_theme_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="6dp"/>
     </LinearLayout>
 
-    <LinearLayout
+    <Button
+        android:id="@+id/share_app_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:gravity="start|center_vertical"
+        android:text="@string/share_contact"
+        app:icon="@drawable/ic_share"
+        app:iconGravity="end"
+        app:iconPadding="@dimen/icons_end_margin"
+        app:iconTint="?attr/iconColor"/>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/share_contact"
-            android:textColor="@color/black"
-            android:textSize="@dimen/regular_size"
-            android:layout_marginStart="@dimen/small_margin"
-            android:layout_marginVertical="@dimen/vertical_settings_margin"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_share"
-            android:layout_marginEnd="@dimen/icons_end_margin"/>
-    </LinearLayout>
-
-    <LinearLayout
+    <Button
+        android:id="@+id/contact_support_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:gravity="start|center_vertical"
+        android:text="@string/contact_support"
+        app:icon="@drawable/ic_support"
+        app:iconGravity="end"
+        app:iconPadding="@dimen/icons_end_margin"
+        app:iconTint="?attr/iconColor"/>
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/vertical_settings_margin"
-            android:layout_marginStart="@dimen/small_margin"
-            android:layout_weight="1"
-            android:text="@string/contact_support"
-            android:textColor="@color/black"
-            android:textSize="@dimen/regular_size" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_support"
-            android:layout_marginEnd="@dimen/icons_end_margin"/>
-    </LinearLayout>
-
-    <LinearLayout
+    <Button
+        android:id="@+id/user_agreement_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/user_agreement"
-            android:textColor="@color/black"
-            android:textSize="@dimen/regular_size"
-            android:layout_marginStart="@dimen/small_margin"
-            android:layout_marginVertical="@dimen/vertical_settings_margin"/>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_arrow"
-            android:layout_marginEnd="@dimen/icons_end_margin"/>
-    </LinearLayout>
+        android:gravity="start|center_vertical"
+        android:text="@string/user_agreement"
+        app:icon="@drawable/ic_arrow"
+        app:iconGravity="end"
+        app:iconPadding="@dimen/icons_end_margin"
+        app:iconTint="?attr/iconColor"/>
 
 </LinearLayout>
