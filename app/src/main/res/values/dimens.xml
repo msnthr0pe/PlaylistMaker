@@ -2,13 +2,17 @@
 <resources>
     <dimen name="title_size">22sp</dimen>
     <dimen name="regular_size">16sp</dimen>
+    <dimen name="small_size">11sp</dimen>
     <dimen name="vertical_settings_margin">21dp</dimen>
-    <dimen name="small_margin">16dp</dimen>
+    <dimen name="medium_margin">16dp</dimen>
+    <dimen name="small_margin">8dp</dimen>
+    <dimen name="small_icon">16dp</dimen>
     <dimen name="title_margin">12dp</dimen>
     <dimen name="icons_end_margin">12dp</dimen>
     <dimen name="top_margin">10dp</dimen>
     <dimen name="default_padding">4dp</dimen>
     <dimen name="corner_radius">16dp</dimen>
+    <dimen name="small_corner_radius">8dp</dimen>
     <dimen name="default_inset">0dp</dimen>
 
 </resources>
