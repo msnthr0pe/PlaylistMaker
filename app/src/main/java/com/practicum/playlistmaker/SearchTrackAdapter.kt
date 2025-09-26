@@ -8,9 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import java.text.SimpleDateFormat
+import java.util.Locale
 
-class SearchTrackAdapter(val tracks: List<Track>) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
-
+class SearchTrackAdapter(var tracks: List<Track>) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
 
     inner class SearchTrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val trackNameText: TextView = itemView.findViewById(R.id.search_song_title)
@@ -21,7 +22,7 @@ class SearchTrackAdapter(val tracks: List<Track>) : RecyclerView.Adapter<SearchT
         fun bind(track: Track) {
             trackNameText.text = track.trackName
             artistNameText.text = track.artistName
-            trackTime.text = track.trackTime
+            trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
             Glide.with(itemView.context)
                 .load(track.artworkUrl100)
                 .centerCrop()
@@ -47,4 +48,9 @@ class SearchTrackAdapter(val tracks: List<Track>) : RecyclerView.Adapter<SearchT
     }
 
     override fun getItemCount(): Int = tracks.size
+
+    fun updateData(newTracks: List<Track>) {
+        tracks = newTracks
+        notifyDataSetChanged()
+    }
 }
