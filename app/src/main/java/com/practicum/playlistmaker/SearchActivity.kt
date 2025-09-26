@@ -17,8 +17,6 @@ import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import retrofit2.Call
 import retrofit2.Response
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 
 class SearchActivity : AppCompatActivity() {
@@ -49,6 +47,7 @@ class SearchActivity : AppCompatActivity() {
         clearBtn.setOnClickListener {
             searchField.setText("")
             searchText = ""
+            adapter.updateData(emptyList())
 
             val view = this.currentFocus
             if (view != null) {
@@ -105,14 +104,7 @@ class SearchActivity : AppCompatActivity() {
                 response: Response<TrackSearchResponse?>,
             ) {
                 if (response.isSuccessful) {
-                    val tracks: List<Track> = response.body()?.results?.map{
-                        Track(
-                            trackName = it.trackName,
-                            artistName = it.artistName,
-                            trackTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(it.trackTimeMillis),
-                            artworkUrl100 = it.artworkUrl100
-                        )
-                    } ?: emptyList()
+                    val tracks: List<Track> = response.body()?.results?: emptyList()
                     if (tracks.isNotEmpty()) {
                         adapter.updateData(tracks)
                     } else {

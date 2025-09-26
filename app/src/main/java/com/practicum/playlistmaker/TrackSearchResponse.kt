@@ -2,5 +2,5 @@ package com.practicum.playlistmaker
 
 data class TrackSearchResponse(
     val resultCount: Int,
-    val results: List<TrackResponse>
+    val results: List<Track>
 )
