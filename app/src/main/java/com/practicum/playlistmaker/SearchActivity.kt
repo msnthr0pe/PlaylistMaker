@@ -2,9 +2,12 @@ package com.practicum.playlistmaker
 
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,11 +15,21 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
+import retrofit2.Call
+import retrofit2.Response
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class SearchActivity : AppCompatActivity() {
 
     private var searchText = ""
+    private var lastSearchQuery = ""
+    private lateinit var adapter: SearchTrackAdapter
+    private lateinit var recycler: RecyclerView
+    private lateinit var searchPlaceholderLayout: LinearLayout
+    private lateinit var noInternetPlaceholderLayout: LinearLayout
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,54 +71,78 @@ class SearchActivity : AppCompatActivity() {
                 clearBtn.isVisible = false
             }
         }
+
+        searchField.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                setSearchPlaceholder(false)
+                setNoInternetPlaceholder(false)
+                lastSearchQuery = searchText
+                loadTracks()
+                true
+            }
+            false
+        }
+
+        findViewById<Button>(R.id.retry_search_button).setOnClickListener {
+            setSearchPlaceholder(false)
+            setNoInternetPlaceholder(false)
+            loadTracks()
+        }
     }
 
     private fun setupRecycler() {
-        val recycler = findViewById<RecyclerView>(R.id.search_recycler)
-        val adapter = SearchTrackAdapter(getMockData())
+        searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
+        noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
+        recycler = findViewById(R.id.search_recycler)
+        adapter = SearchTrackAdapter(emptyList())
         recycler.adapter = adapter
     }
 
-    private fun getMockData(): List<Track> {
-        return listOf(
-            Track(
-                trackName = "Smells Like Teen Spirit",
-                artistName = "Nirvana",
-                trackTime = "5:01",
-                artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music115/v4/7b/58/c2/7b58c21a-2b51-2bb2-e59a-9bb9b96ad8c3/00602567924166.rgb.jpg/100x100bb.jpg",
-            ),
-            Track(
-                trackName = "Billie Jean",
-                artistName = "Michael Jackson",
-                trackTime = "4:35",
-                artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/3d/9d/38/3d9d3811-71f0-3a0e-1ada-3004e56ff852/827969428726.jpg/100x100bb.jpg",
-            ),
-            Track(
-                trackName = "Stayin' Alive",
-                artistName = "Bee Gees",
-                trackTime = "4:10",
-                artworkUrl100 = "https://is4-ssl.mzstatic.com/image/thumb/Music115/v4/1f/80/1f/1f801fc1-8c0f-ea3e-d3e5-387c6619619e/16UMGIM86640.rgb.jpg/100x100bb.jpg",
-            ),
-            Track(
-                trackName = "Whole Lotta Love",
-                artistName = "Led Zeppelin",
-                trackTime = "5:33",
-                artworkUrl100 = "https://is2-ssl.mzstatic.com/image/thumb/Music62/v4/7e/17/e3/7e17e33f-2efa-2a36-e916-7f808576cf6b/mzm.fyigqcbs.jpg/100x100bb.jpg",
-            ),
-            Track(
-                trackName = "Sweet Child O'Mine",
-                artistName = "Guns N' Roses",
-                trackTime = "5:03",
-                artworkUrl100 = "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg",
-            ),
-            Track(
-                trackName = "Here Comes The Sun (Remastered super dolby atmos edition)",
-                artistName = "The Beatles",
-                trackTime = "4:01",
-                artworkUrl100 = "test",
-            ),
-        )
+    private fun loadTracks() {
+        SearchRetrofit.searchMusicApi.search(text = lastSearchQuery).enqueue(object : retrofit2.Callback<TrackSearchResponse> {
+            override fun onResponse(
+                call: Call<TrackSearchResponse?>,
+                response: Response<TrackSearchResponse?>,
+            ) {
+                if (response.isSuccessful) {
+                    val tracks: List<Track> = response.body()?.results?.map{
+                        Track(
+                            trackName = it.trackName,
+                            artistName = it.artistName,
+                            trackTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(it.trackTimeMillis),
+                            artworkUrl100 = it.artworkUrl100
+                        )
+                    } ?: emptyList()
+                    if (tracks.isNotEmpty()) {
+                        adapter.updateData(tracks)
+                    } else {
+                        setSearchPlaceholder(true)
+                        adapter.updateData(emptyList())
+                    }
+                }
+            }
+
+            override fun onFailure(
+                call: Call<TrackSearchResponse?>,
+                t: Throwable,
+            ) {
+                setNoInternetPlaceholder(true)
+                adapter.updateData(emptyList())
+            }
+
+        })
     }
+
+    private fun setSearchPlaceholder(isVisible: Boolean) {
+        searchPlaceholderLayout.isVisible = isVisible
+        recycler.isVisible = !isVisible
+    }
+
+    private fun setNoInternetPlaceholder(isVisible: Boolean) {
+        noInternetPlaceholderLayout.isVisible = isVisible
+        recycler.isVisible = !isVisible
+    }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
