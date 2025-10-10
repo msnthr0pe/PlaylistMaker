@@ -2,12 +2,10 @@ package com.practicum.playlistmaker
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SwitchCompat
 import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
@@ -24,19 +22,16 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
+        val isDarkThemeEnabled = (applicationContext as PlaylistMakerApp).isDark
+
         val darkThemeSwitch = findViewById<SwitchCompat>(R.id.dark_theme_switch)
 
-        if (AppCompatDelegate.getDefaultNightMode() == AppCompatDelegate.MODE_NIGHT_YES) {
+        if (isDarkThemeEnabled) {
                 darkThemeSwitch.isChecked = true
         }
 
         darkThemeSwitch.setOnCheckedChangeListener { _, isNightTheme ->
-            Log.d("themeInfo", "$isNightTheme")
-            if (isNightTheme) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
+            (applicationContext as PlaylistMakerApp).setDarkTheme(isNightTheme)
         }
         findViewById<ImageView>(R.id.back_settings_btn).setOnClickListener {
             finish()
