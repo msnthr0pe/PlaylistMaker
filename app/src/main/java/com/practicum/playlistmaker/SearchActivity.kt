@@ -27,6 +27,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recycler: RecyclerView
     private lateinit var searchPlaceholderLayout: LinearLayout
     private lateinit var noInternetPlaceholderLayout: LinearLayout
+    private val history by lazy { SearchHistory() }
+    private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,6 +49,7 @@ class SearchActivity : AppCompatActivity() {
         clearBtn.setOnClickListener {
             searchField.setText("")
             searchText = ""
+            history.writeHistory(historyPrefs, arrayOf())
             adapter.updateData(emptyList())
 
             val view = this.currentFocus
@@ -54,6 +57,7 @@ class SearchActivity : AppCompatActivity() {
                 val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
+            //to do("Finish implementing history")
         }
 
         clearBtn.visibility = View.GONE
@@ -66,9 +70,11 @@ class SearchActivity : AppCompatActivity() {
             if (searchField.text.isNotEmpty()) {
                 clearBtn.isVisible = true
                 searchText = searchField.text.toString()
+                adapter.updateData(history.readHistory(historyPrefs)?: emptyList())
             } else {
                 clearBtn.isVisible = false
             }
+            //to do ("Finish implementing history")
         }
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
@@ -93,8 +99,13 @@ class SearchActivity : AppCompatActivity() {
         searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
         noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
         recycler = findViewById(R.id.search_recycler)
-        adapter = SearchTrackAdapter(emptyList())
+        var historyList = arrayOf<Track>()
+        adapter = SearchTrackAdapter(emptyList()) {
+            historyList = historyList + it
+            history.writeHistory(historyPrefs, historyList)
+        }
         recycler.adapter = adapter
+        //to do ("Finish implementing history")
     }
 
     private fun loadTracks() {

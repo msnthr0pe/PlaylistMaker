@@ -133,7 +133,6 @@
                 android:backgroundTint="?attr/genericTextColor"
                 android:text="@string/refresh"/>
 
-
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
