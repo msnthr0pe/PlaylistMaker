@@ -2,7 +2,6 @@ package com.practicum.playlistmaker
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -150,7 +149,6 @@ class SearchActivity : AppCompatActivity() {
         if (history != null && history.isNotEmpty()) {
             adapter.updateData(history)
             historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
-            Log.d("History", history.toString())
             setRecyclerHeight(true)
             findViewById<TextView>(R.id.you_searched_for_text).isVisible = true
             findViewById<Button>(R.id.clear_history_btn).isVisible = true
