@@ -13,7 +13,7 @@ class SearchHistory {
             .getString(HISTORY_PREFS_KEY, null) ?: return null
         val json = Gson().fromJson(historyJson, Array<Track>::class.java)
 
-        return ArrayList(json.toList())
+        return ArrayList(json.toList().reversed())
     }
 
     fun writeHistory(prefs: SharedPreferences, tracks: Array<Track>) {

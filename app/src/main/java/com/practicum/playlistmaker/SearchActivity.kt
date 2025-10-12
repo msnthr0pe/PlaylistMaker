@@ -1,13 +1,17 @@
 package com.practicum.playlistmaker
 
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -29,6 +33,15 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noInternetPlaceholderLayout: LinearLayout
     private val history by lazy { SearchHistory() }
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
+    private var currentHistory = arrayOf<Track>()
+    private val prefsChangeListener by lazy {
+        SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
+            if (key == HISTORY_PREFS_KEY) {
+                adapter.updateData(history.readHistory(prefs) ?: emptyList())
+            }
+        }
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +62,6 @@ class SearchActivity : AppCompatActivity() {
         clearBtn.setOnClickListener {
             searchField.setText("")
             searchText = ""
-            history.writeHistory(historyPrefs, arrayOf())
-            adapter.updateData(emptyList())
 
             val view = this.currentFocus
             if (view != null) {
@@ -70,11 +81,18 @@ class SearchActivity : AppCompatActivity() {
             if (searchField.text.isNotEmpty()) {
                 clearBtn.isVisible = true
                 searchText = searchField.text.toString()
-                adapter.updateData(history.readHistory(historyPrefs)?: emptyList())
+                hideHistory()
             } else {
+                showHistory()
                 clearBtn.isVisible = false
             }
             //to do ("Finish implementing history")
+        }
+
+        searchField.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                showHistory()
+            }
         }
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
@@ -99,13 +117,51 @@ class SearchActivity : AppCompatActivity() {
         searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
         noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
         recycler = findViewById(R.id.search_recycler)
-        var historyList = arrayOf<Track>()
         adapter = SearchTrackAdapter(emptyList()) {
-            historyList = historyList + it
-            history.writeHistory(historyPrefs, historyList)
+            currentHistory = currentHistory + it
+            history.writeHistory(historyPrefs, currentHistory)
         }
         recycler.adapter = adapter
+        findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
+            history.writeHistory(historyPrefs, arrayOf())
+            currentHistory = emptyArray()
+            hideHistory()
+        }
+
         //to do ("Finish implementing history")
+    }
+
+    private fun setRecyclerHeight(isHistory: Boolean) {
+        if (isHistory) {
+            val heightInDp = 180
+            val density = resources.displayMetrics.density
+            val heightInPx = (heightInDp * density).toInt()
+
+            recycler.layoutParams.height = heightInPx
+            recycler.requestLayout()
+        } else {
+            recycler.layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
+        }
+    }
+
+    private fun showHistory() {
+        val history = history.readHistory(historyPrefs)
+        if (history != null && history.isNotEmpty()) {
+            adapter.updateData(history)
+            Log.d("History", history.toString())
+            setRecyclerHeight(true)
+            findViewById<TextView>(R.id.you_searched_for_text).isVisible = true
+            findViewById<Button>(R.id.clear_history_btn).isVisible = true
+        } else {
+            adapter.updateData(emptyList())
+        }
+    }
+
+    private fun hideHistory() {
+        adapter.updateData(emptyList())
+        findViewById<TextView>(R.id.you_searched_for_text).isVisible = false
+        findViewById<Button>(R.id.clear_history_btn).isVisible = false
+        setRecyclerHeight(false)
     }
 
     private fun loadTracks() {
