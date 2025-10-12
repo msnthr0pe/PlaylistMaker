@@ -38,6 +38,7 @@ class SearchActivity : AppCompatActivity() {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
                 adapter.updateData(history.readHistory(prefs) ?: emptyList())
+                setRecyclerHeight(true)
             }
         }
     }
@@ -133,7 +134,11 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setRecyclerHeight(isHistory: Boolean) {
         if (isHistory) {
-            val heightInDp = 180
+            var heightInDp = 180
+            val currentHistorySize = currentHistory.size
+            if (currentHistorySize > 0 && currentHistorySize < 3) {
+                heightInDp = 60 * currentHistorySize
+            }
             val density = resources.displayMetrics.density
             val heightInPx = (heightInDp * density).toInt()
 
@@ -148,6 +153,7 @@ class SearchActivity : AppCompatActivity() {
         val history = history.readHistory(historyPrefs)
         if (history != null && history.isNotEmpty()) {
             adapter.updateData(history)
+            historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
             Log.d("History", history.toString())
             setRecyclerHeight(true)
             findViewById<TextView>(R.id.you_searched_for_text).isVisible = true
@@ -158,6 +164,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideHistory() {
+        historyPrefs.unregisterOnSharedPreferenceChangeListener(prefsChangeListener)
         adapter.updateData(emptyList())
         findViewById<TextView>(R.id.you_searched_for_text).isVisible = false
         findViewById<Button>(R.id.clear_history_btn).isVisible = false
