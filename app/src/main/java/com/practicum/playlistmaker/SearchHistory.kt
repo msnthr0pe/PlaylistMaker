@@ -16,8 +16,15 @@ class SearchHistory {
         return ArrayList(json.toList().reversed())
     }
 
-    fun writeHistory(prefs: SharedPreferences, tracks: Array<Track>) {
-        val json = Gson().toJson(tracks)
+    fun writeHistory(prefs: SharedPreferences, tracks: ArrayList<Track>) {
+        if (tracks.isNotEmpty() && tracks.count{it == tracks.last()} > 1) {
+            val lastElement = tracks.last()
+            tracks.remove(lastElement)
+        }
+        if (tracks.size == 11) {
+            tracks.removeAt(0)
+        }
+        val json = Gson().toJson(tracks.toTypedArray())
         prefs.edit {
             putString(HISTORY_PREFS_KEY, json)
         }

@@ -33,7 +33,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noInternetPlaceholderLayout: LinearLayout
     private val history by lazy { SearchHistory() }
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
-    private var currentHistory = arrayOf<Track>()
+    private var currentHistory: ArrayList<Track> = arrayListOf()
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
@@ -42,8 +42,6 @@ class SearchActivity : AppCompatActivity() {
             }
         }
     }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +67,6 @@ class SearchActivity : AppCompatActivity() {
                 val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
-            //to do("Finish implementing history")
         }
 
         clearBtn.visibility = View.GONE
@@ -87,7 +84,6 @@ class SearchActivity : AppCompatActivity() {
                 showHistory()
                 clearBtn.isVisible = false
             }
-            //to do ("Finish implementing history")
         }
 
         searchField.setOnFocusChangeListener { _, hasFocus ->
@@ -118,18 +114,18 @@ class SearchActivity : AppCompatActivity() {
         searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
         noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
         recycler = findViewById(R.id.search_recycler)
+        currentHistory = history.readHistory(historyPrefs) ?: arrayListOf()
         adapter = SearchTrackAdapter(emptyList()) {
-            currentHistory = currentHistory + it
+            currentHistory.add(it)
             history.writeHistory(historyPrefs, currentHistory)
         }
         recycler.adapter = adapter
         findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
-            history.writeHistory(historyPrefs, arrayOf())
-            currentHistory = emptyArray()
+            history.writeHistory(historyPrefs, arrayListOf())
+            currentHistory = arrayListOf()
             hideHistory()
         }
 
-        //to do ("Finish implementing history")
     }
 
     private fun setRecyclerHeight(isHistory: Boolean) {
