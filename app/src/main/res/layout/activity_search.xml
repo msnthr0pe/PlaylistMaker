@@ -169,8 +169,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textSize="14sp"
-                app:cornerRadius="54dp"
                 android:visibility="gone"
+                android:backgroundTint="?attr/genericTextColor"
+                android:textColor="?attr/genericScreenBackground"
+                app:cornerRadius="54dp"
                 android:text="@string/clear_history"/>
         </LinearLayout>
 
