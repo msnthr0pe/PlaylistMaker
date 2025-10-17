@@ -11,7 +11,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class SearchTrackAdapter(var tracks: List<Track>) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
+class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Unit) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
 
     inner class SearchTrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val trackNameText: TextView = itemView.findViewById(R.id.search_song_title)
@@ -29,6 +29,9 @@ class SearchTrackAdapter(var tracks: List<Track>) : RecyclerView.Adapter<SearchT
                 .transform(RoundedCorners(6))
                 .placeholder(R.drawable.ic_placeholder)
                 .into(artworkUrlImage)
+            itemView.setOnClickListener {
+                onItemClick(track)
+            }
         }
     }
 
