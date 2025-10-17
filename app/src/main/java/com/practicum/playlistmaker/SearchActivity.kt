@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker
 
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
@@ -117,6 +118,9 @@ class SearchActivity : AppCompatActivity() {
         adapter = SearchTrackAdapter(emptyList()) {
             currentHistory.add(it)
             history.writeHistory(historyPrefs, currentHistory)
+            val intent = Intent(this, AudioPlayerActivity::class.java)
+            intent.putExtra("Track", it)
+            startActivity(intent)
         }
         recycler.adapter = adapter
         findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
