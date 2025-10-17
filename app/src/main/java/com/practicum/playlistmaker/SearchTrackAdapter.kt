@@ -6,10 +6,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Unit) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
 
@@ -22,13 +18,8 @@ class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Un
         fun bind(track: Track) {
             trackNameText.text = track.trackName
             artistNameText.text = track.artistName
-            trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTimeMillis)
-            Glide.with(itemView.context)
-                .load(track.artworkUrl100)
-                .centerCrop()
-                .transform(RoundedCorners(6))
-                .placeholder(R.drawable.ic_placeholder)
-                .into(artworkUrlImage)
+            trackTime.text = PlaylistUtil.getFormattedTime(track.trackTimeMillis)
+            PlaylistUtil.loadPicInto(itemView.context, track.artworkUrl100, artworkUrlImage)
             itemView.setOnClickListener {
                 onItemClick(track)
             }
