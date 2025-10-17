@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/PlayerScreenStyle"
     android:background="?attr/genericScreenBackground"
     tools:context=".AudioPlayerActivity">
 
@@ -45,7 +44,6 @@
             app:layout_constraintTop_toTopOf="@+id/guideline" />
 
         <TextView
-            android:textAppearance="@style/MainTextView"
             android:id="@+id/player_song_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -56,7 +54,6 @@
             app:layout_constraintTop_toBottomOf="@+id/player_song_image" />
 
         <TextView
-            android:textAppearance="@style/MainTextView"
             android:id="@+id/player_artist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,7 +98,6 @@
             app:layout_constraintTop_toTopOf="@+id/play_button" />
 
         <TextView
-            android:textAppearance="@style/MainTextView"
             android:id="@+id/current_track_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -113,10 +109,11 @@
             app:layout_constraintEnd_toEndOf="parent"/>
 
         <TextView
-            android:textAppearance="@style/RegularTextView"
+            android:id="@+id/duration_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/duration"
+            android:textColor="@color/yp_gray"
             android:textSize="13sp"
             android:paddingTop="9dp"
             android:paddingBottom="8dp"
@@ -124,6 +121,108 @@
             android:layout_marginStart="@dimen/medium_margin"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/play_button" />
+
+        <TextView
+            android:id="@+id/duration_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:text="@string/default_time"
+            android:textSize="13sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/duration_text"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/collection_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/collection"
+            android:textColor="@color/yp_gray"
+            android:textSize="13sp"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
+            android:layout_marginStart="@dimen/medium_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/duration_text" />
+
+        <TextView
+            android:id="@+id/collection_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:text="@string/default_value"
+            android:textSize="13sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/collection_text"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/year_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/year"
+            android:textColor="@color/yp_gray"
+            android:textSize="13sp"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
+            android:layout_marginStart="@dimen/medium_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/collection_text" />
+
+        <TextView
+            android:id="@+id/song_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:text="@string/default_value"
+            android:textSize="13sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/year_text"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/genre_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/genre"
+            android:textColor="@color/yp_gray"
+            android:textSize="13sp"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
+            android:layout_marginStart="@dimen/medium_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/year_text" />
+
+        <TextView
+            android:id="@+id/genre_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:text="@string/default_value"
+            android:textSize="13sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/genre_text"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/country_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/country"
+            android:textColor="@color/yp_gray"
+            android:textSize="13sp"
+            android:paddingTop="9dp"
+            android:paddingBottom="8dp"
+            android:layout_marginStart="@dimen/medium_margin"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/genre_text" />
+
+        <TextView
+            android:id="@+id/country_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/medium_margin"
+            android:text="@string/default_value"
+            android:textSize="13sp"
+            app:layout_constraintBaseline_toBaselineOf="@id/country_text"
+            app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
