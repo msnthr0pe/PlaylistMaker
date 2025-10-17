@@ -28,6 +28,10 @@
         <item name="android:textSize">@dimen/title_size</item>
     </style>
 
+    <style name="PlayerScreenStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:textViewStyle">@style/BaseTextView</item>
+    </style>
+
     <style name="SettingsScreenStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="genericScreenBackground">@color/white</item>
         <item name="genericTextColor">@color/yp_black</item>

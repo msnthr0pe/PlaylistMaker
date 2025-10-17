@@ -6,5 +6,6 @@
     <attr name="iconColor" format="color"/>
     <attr name="searchHintColor" format="color"/>
     <attr name="searchBackgroundColor" format="color"/>
+    <attr name="playerButtonsColor" format="color"/>
 
 </resources>

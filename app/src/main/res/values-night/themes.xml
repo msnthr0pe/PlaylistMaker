@@ -10,6 +10,7 @@
         <item name="genericTextColor">@color/white</item>
         <item name="searchHintColor">@color/yp_black</item>
         <item name="searchBackgroundColor">@color/white</item>
+        <item name="playerButtonsColor">@color/white</item>
     </style>
 
     <style name="TextView" parent="Widget.MaterialComponents.TextView">

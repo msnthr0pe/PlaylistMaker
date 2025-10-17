@@ -19,4 +19,5 @@
     <string name="network_error_text">Проблемы со связью\n\nЗагрузка не удалась. Проверьте подключение к интернету</string>
     <string name="clear_history">Очистить историю</string>
     <string name="you_searched_for">Вы искали</string>
+    <string name="duration">Длительность</string>
 </resources>
