@@ -3,6 +3,8 @@ package com.practicum.playlistmaker
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -34,6 +36,11 @@ class SearchActivity : AppCompatActivity() {
     private val history by lazy { SearchHistory() }
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
     private var currentHistory: ArrayList<Track> = arrayListOf()
+    private val handler: Handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { performSearch() }
+    private var isClickAllowed = true
+
+
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
@@ -80,6 +87,7 @@ class SearchActivity : AppCompatActivity() {
                 clearBtn.isVisible = true
                 searchText = searchField.text.toString()
                 hideHistory()
+                searchDebounce()
             } else {
                 showHistory()
                 clearBtn.isVisible = false
@@ -110,17 +118,40 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun performSearch() {
+        setSearchPlaceholder(false)
+        setNoInternetPlaceholder(false)
+        lastSearchQuery = searchText
+        loadTracks()
+    }
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     private fun setupRecycler() {
         searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
         noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
         recycler = findViewById(R.id.search_recycler)
         currentHistory = history.readHistory(historyPrefs) ?: arrayListOf()
         adapter = SearchTrackAdapter(emptyList()) {
-            currentHistory.add(it)
-            history.writeHistory(historyPrefs, currentHistory)
-            val intent = Intent(this, AudioPlayerActivity::class.java)
-            intent.putExtra("Track", it)
-            startActivity(intent)
+            if (clickDebounce()) {
+                currentHistory.add(it)
+                history.writeHistory(historyPrefs, currentHistory)
+                val intent = Intent(this, AudioPlayerActivity::class.java)
+                intent.putExtra("Track", it)
+                startActivity(intent)
+            }
         }
         recycler.adapter = adapter
         findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
@@ -221,7 +252,9 @@ class SearchActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val TEXT_KEY = "TEXT"
-        const val DEFAULT_TEXT = ""
+        private const val TEXT_KEY = "TEXT"
+        private const val DEFAULT_TEXT = ""
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
