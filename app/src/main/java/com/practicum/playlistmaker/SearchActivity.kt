@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +34,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recycler: RecyclerView
     private lateinit var searchPlaceholderLayout: LinearLayout
     private lateinit var noInternetPlaceholderLayout: LinearLayout
+    private lateinit var searchProgressBar: ProgressBar
     private val history by lazy { SearchHistory() }
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
     private var currentHistory: ArrayList<Track> = arrayListOf()
@@ -61,6 +63,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         setupRecycler()
+
+        searchProgressBar = findViewById(R.id.search_progress_bar)
+
 
         val searchField = findViewById<EditText>(R.id.search_et)
         val clearBtn = findViewById<ImageView>(R.id.clear_text_btn)
@@ -201,11 +206,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun loadTracks() {
+        searchProgressBar.isVisible = true
         SearchRetrofit.searchMusicApi.search(text = lastSearchQuery).enqueue(object : retrofit2.Callback<TrackSearchResponse> {
             override fun onResponse(
                 call: Call<TrackSearchResponse?>,
                 response: Response<TrackSearchResponse?>,
             ) {
+                searchProgressBar.isVisible = false
                 if (response.isSuccessful) {
                     val tracks: List<Track> = response.body()?.results?: emptyList()
                     if (tracks.isNotEmpty()) {
@@ -221,6 +228,7 @@ class SearchActivity : AppCompatActivity() {
                 call: Call<TrackSearchResponse?>,
                 t: Throwable,
             ) {
+                searchProgressBar.isVisible = false
                 setNoInternetPlaceholder(true)
                 adapter.updateData(emptyList())
             }
