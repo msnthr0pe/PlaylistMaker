@@ -2,6 +2,8 @@ package com.practicum.playlistmaker
 
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
@@ -9,6 +11,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class AudioPlayerActivity : AppCompatActivity() {
 
@@ -23,6 +27,8 @@ class AudioPlayerActivity : AppCompatActivity() {
     private var isPlaying: Boolean = false
     private var playerState: PlayerState = PlayerState.DEFAULT
     private var mediaPlayer = MediaPlayer()
+    private lateinit var currentTrackTime: TextView
+    private var mainThreadHandler: Handler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +39,7 @@ class AudioPlayerActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        mainThreadHandler = Handler(Looper.getMainLooper())
         setData()
         setOnClickListeners()
 
@@ -50,6 +57,7 @@ class AudioPlayerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.song_year).text = track.releaseDate.substring(0, 4)
         findViewById<TextView>(R.id.genre_name).text = track.primaryGenreName
         findViewById<TextView>(R.id.country_name).text = track.country
+        currentTrackTime = findViewById(R.id.current_track_time)
         preparePlayer(track.previewUrl)
     }
 
@@ -61,11 +69,15 @@ class AudioPlayerActivity : AppCompatActivity() {
         playButton.isEnabled = false
         playButton.setOnClickListener {
             isPlaying = !isPlaying
-            playButton.setImageResource(
-                if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
-            )
+            setPlayButtonImage()
             playbackControl()
         }
+    }
+
+    private fun setPlayButtonImage() {
+        playButton.setImageResource(
+            if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+        )
     }
 
     private fun preparePlayer(songUrl: String) {
@@ -77,17 +89,38 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
         mediaPlayer.setOnCompletionListener {
             playerState = PlayerState.PREPARED
+            mediaPlayer.seekTo(0)
+            isPlaying = false
+            setPlayButtonImage()
         }
     }
 
     private fun startPlayer() {
         mediaPlayer.start()
         playerState = PlayerState.PLAYING
+        startHandler()
+    }
+
+    private fun startHandler() {
+        mainThreadHandler?.postDelayed(
+            object : Runnable {
+                override fun run() {
+                    val playbackPosition = SimpleDateFormat("m:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+                    currentTrackTime.text = playbackPosition
+                    mainThreadHandler?.postDelayed(
+                        this,
+                        PLAYBACK_PROGRESS_REFRESH_DELAY
+                    )
+                }
+            },
+            PLAYBACK_PROGRESS_REFRESH_DELAY
+        )
     }
 
     private fun pausePlayer() {
         mediaPlayer.pause()
         playerState = PlayerState.PAUSED
+        mainThreadHandler?.removeCallbacksAndMessages(null)
     }
 
     private fun playbackControl() {
@@ -98,18 +131,25 @@ class AudioPlayerActivity : AppCompatActivity() {
             PlayerState.PREPARED, PlayerState.PAUSED -> {
                 startPlayer()
             }
-
             PlayerState.DEFAULT -> Unit
         }
     }
 
     override fun onPause() {
         super.onPause()
+        isPlaying = false
+        setPlayButtonImage()
         pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        isPlaying = false
+        setPlayButtonImage()
         mediaPlayer.release()
+    }
+
+    companion object {
+        private const val PLAYBACK_PROGRESS_REFRESH_DELAY = 300L
     }
 }

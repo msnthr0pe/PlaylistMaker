@@ -90,13 +90,14 @@ class SearchActivity : AppCompatActivity() {
         searchField.doOnTextChanged { _, _, _, _ ->
             if (searchField.text.isNotEmpty()) {
                 clearBtn.isVisible = true
-                searchText = searchField.text.toString()
                 hideHistory()
-                searchDebounce()
             } else {
                 showHistory()
+                setSearchPlaceholder(false)
                 clearBtn.isVisible = false
             }
+            searchText = searchField.text.toString()
+            searchDebounce()
         }
 
         searchField.setOnFocusChangeListener { _, hasFocus ->
@@ -107,10 +108,7 @@ class SearchActivity : AppCompatActivity() {
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                setSearchPlaceholder(false)
-                setNoInternetPlaceholder(false)
-                lastSearchQuery = searchText
-                loadTracks()
+                performSearch()
                 true
             }
             false
@@ -131,6 +129,7 @@ class SearchActivity : AppCompatActivity() {
     private fun performSearch() {
         setSearchPlaceholder(false)
         setNoInternetPlaceholder(false)
+        if (searchText.isEmpty()) return
         lastSearchQuery = searchText
         loadTracks()
     }
