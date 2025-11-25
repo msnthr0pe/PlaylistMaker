@@ -20,7 +20,7 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     private lateinit var playButton: ImageButton
-    private var playButtonIsPressed: Boolean = false
+    private var isPlaying: Boolean = false
     private var playerState: PlayerState = PlayerState.DEFAULT
     private var mediaPlayer = MediaPlayer()
 
@@ -60,7 +60,11 @@ class AudioPlayerActivity : AppCompatActivity() {
         playButton = findViewById(R.id.play_button)
         playButton.isEnabled = false
         playButton.setOnClickListener {
-            playButtonIsPressed = !playButtonIsPressed
+            isPlaying = !isPlaying
+            playButton.setImageResource(
+                if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+            )
+            playbackControl()
         }
     }
 
@@ -74,5 +78,38 @@ class AudioPlayerActivity : AppCompatActivity() {
         mediaPlayer.setOnCompletionListener {
             playerState = PlayerState.PREPARED
         }
+    }
+
+    private fun startPlayer() {
+        mediaPlayer.start()
+        playerState = PlayerState.PLAYING
+    }
+
+    private fun pausePlayer() {
+        mediaPlayer.pause()
+        playerState = PlayerState.PAUSED
+    }
+
+    private fun playbackControl() {
+        when(playerState) {
+            PlayerState.PLAYING -> {
+                pausePlayer()
+            }
+            PlayerState.PREPARED, PlayerState.PAUSED -> {
+                startPlayer()
+            }
+
+            PlayerState.DEFAULT -> Unit
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        pausePlayer()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer.release()
     }
 }

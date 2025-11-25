@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="84dp"
+    android:height="84dp"
+    android:viewportWidth="84"
+    android:viewportHeight="84">
+  <!-- Левая полоска паузы -->
+  <path
+      android:pathData="M37.5,58.333H29.167V25H37.5V58.333Z"
+      android:fillColor="?attr/genericScreenBackground"/>
+  <!-- Правая полоска паузы -->
+  <path
+      android:pathData="M54.167,58.333H45.833V25H54.167V58.333Z"
+      android:fillColor="?attr/genericScreenBackground"/>
+</vector>
