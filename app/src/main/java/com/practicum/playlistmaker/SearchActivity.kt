@@ -3,6 +3,8 @@ package com.practicum.playlistmaker
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -11,6 +13,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -31,9 +34,15 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var recycler: RecyclerView
     private lateinit var searchPlaceholderLayout: LinearLayout
     private lateinit var noInternetPlaceholderLayout: LinearLayout
+    private lateinit var searchProgressBar: ProgressBar
     private val history by lazy { SearchHistory() }
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
     private var currentHistory: ArrayList<Track> = arrayListOf()
+    private val handler: Handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { performSearch() }
+    private var isClickAllowed = true
+
+
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
@@ -54,6 +63,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         setupRecycler()
+
+        searchProgressBar = findViewById(R.id.search_progress_bar)
+
 
         val searchField = findViewById<EditText>(R.id.search_et)
         val clearBtn = findViewById<ImageView>(R.id.clear_text_btn)
@@ -78,12 +90,14 @@ class SearchActivity : AppCompatActivity() {
         searchField.doOnTextChanged { _, _, _, _ ->
             if (searchField.text.isNotEmpty()) {
                 clearBtn.isVisible = true
-                searchText = searchField.text.toString()
                 hideHistory()
             } else {
                 showHistory()
+                setSearchPlaceholder(false)
                 clearBtn.isVisible = false
             }
+            searchText = searchField.text.toString()
+            searchDebounce()
         }
 
         searchField.setOnFocusChangeListener { _, hasFocus ->
@@ -94,10 +108,7 @@ class SearchActivity : AppCompatActivity() {
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                setSearchPlaceholder(false)
-                setNoInternetPlaceholder(false)
-                lastSearchQuery = searchText
-                loadTracks()
+                performSearch()
                 true
             }
             false
@@ -110,17 +121,41 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun performSearch() {
+        setSearchPlaceholder(false)
+        setNoInternetPlaceholder(false)
+        if (searchText.isEmpty()) return
+        lastSearchQuery = searchText
+        loadTracks()
+    }
+
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
+    }
+
     private fun setupRecycler() {
         searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
         noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
         recycler = findViewById(R.id.search_recycler)
         currentHistory = history.readHistory(historyPrefs) ?: arrayListOf()
         adapter = SearchTrackAdapter(emptyList()) {
-            currentHistory.add(it)
-            history.writeHistory(historyPrefs, currentHistory)
-            val intent = Intent(this, AudioPlayerActivity::class.java)
-            intent.putExtra("Track", it)
-            startActivity(intent)
+            if (clickDebounce()) {
+                currentHistory.add(it)
+                history.writeHistory(historyPrefs, currentHistory)
+                val intent = Intent(this, AudioPlayerActivity::class.java)
+                intent.putExtra("Track", it)
+                startActivity(intent)
+            }
         }
         recycler.adapter = adapter
         findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
@@ -170,11 +205,13 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun loadTracks() {
+        searchProgressBar.isVisible = true
         SearchRetrofit.searchMusicApi.search(text = lastSearchQuery).enqueue(object : retrofit2.Callback<TrackSearchResponse> {
             override fun onResponse(
                 call: Call<TrackSearchResponse?>,
                 response: Response<TrackSearchResponse?>,
             ) {
+                searchProgressBar.isVisible = false
                 if (response.isSuccessful) {
                     val tracks: List<Track> = response.body()?.results?: emptyList()
                     if (tracks.isNotEmpty()) {
@@ -190,6 +227,7 @@ class SearchActivity : AppCompatActivity() {
                 call: Call<TrackSearchResponse?>,
                 t: Throwable,
             ) {
+                searchProgressBar.isVisible = false
                 setNoInternetPlaceholder(true)
                 adapter.updateData(emptyList())
             }
@@ -221,7 +259,9 @@ class SearchActivity : AppCompatActivity() {
     }
 
     companion object {
-        const val TEXT_KEY = "TEXT"
-        const val DEFAULT_TEXT = ""
+        private const val TEXT_KEY = "TEXT"
+        private const val DEFAULT_TEXT = ""
+        private const val SEARCH_DEBOUNCE_DELAY = 2000L
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
