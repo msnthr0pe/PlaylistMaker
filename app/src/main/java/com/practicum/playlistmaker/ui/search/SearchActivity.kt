@@ -22,19 +22,13 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.Creator
-import com.practicum.playlistmaker.HISTORY_PREFS_KEY
-import com.practicum.playlistmaker.HISTORY_PREFS_NAME
+import com.practicum.playlistmaker.presentation.HISTORY_PREFS_KEY
+import com.practicum.playlistmaker.presentation.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.SearchHistory
-import com.practicum.playlistmaker.data.dto.TrackSearchResponse
-import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
-import com.practicum.playlistmaker.domain.api.TracksInteractor
+import com.practicum.playlistmaker.presentation.SearchHistory
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.presentation.SearchHelper
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SearchActivity : AppCompatActivity() {
 
@@ -216,30 +210,26 @@ class SearchActivity : AppCompatActivity() {
 
     private fun loadTracks() {
         searchProgressBar.isVisible = true
-        val tracksInteractor = Creator.provideTracksInteractor()
-        tracksInteractor.searchForTracks(
-            expression = lastSearchQuery,
-            object : TracksInteractor.TrackConsumer {
-                override fun consume(foundTracks: List<Track>?) {
-                    searchProgressBar.isVisible = false
 
-                    if (foundTracks == null) {
-                        searchProgressBar.isVisible = false
-                        setNoInternetPlaceholder(true)
-                        adapter.updateData(emptyList())
-                        return
-                    }
+        SearchHelper.getTracks(
+            lastSearchQuery,
+        ) { foundTracks ->
+            searchProgressBar.isVisible = false
 
-                    if (foundTracks.isNotEmpty()) {
-                        adapter.updateData(foundTracks)
-                    } else {
-                        setSearchPlaceholder(true)
-                        adapter.updateData(emptyList())
-                    }
-                }
-
+            if (foundTracks == null) {
+                searchProgressBar.isVisible = false
+                setNoInternetPlaceholder(true)
+                adapter.updateData(emptyList())
+                return@getTracks
             }
-        )
+
+            if (foundTracks.isNotEmpty()) {
+                adapter.updateData(foundTracks)
+            } else {
+                setSearchPlaceholder(true)
+                adapter.updateData(emptyList())
+            }
+        }
     }
 
     private fun setSearchPlaceholder(isVisible: Boolean) {
