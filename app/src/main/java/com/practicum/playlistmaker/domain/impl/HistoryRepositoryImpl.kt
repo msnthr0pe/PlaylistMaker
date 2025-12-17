@@ -1,15 +1,16 @@
-package com.practicum.playlistmaker.presentation
+package com.practicum.playlistmaker.domain.impl
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import androidx.core.content.edit
+import com.practicum.playlistmaker.domain.api.HistoryRepository
 import com.practicum.playlistmaker.domain.models.Track
 
 const val HISTORY_PREFS_NAME = "history_prefs"
 const val HISTORY_PREFS_KEY = "history"
 
-class SearchHistory {
-    fun readHistory(prefs: SharedPreferences): ArrayList<Track>? {
+class HistoryRepositoryImpl : HistoryRepository {
+    override fun readHistory(prefs: SharedPreferences): ArrayList<Track>? {
         val historyJson = prefs
             .getString(HISTORY_PREFS_KEY, null) ?: return null
         val json = Gson().fromJson(historyJson, Array<Track>::class.java)
@@ -17,7 +18,7 @@ class SearchHistory {
         return ArrayList(json.toList().reversed())
     }
 
-    fun writeHistory(prefs: SharedPreferences, tracks: ArrayList<Track>) {
+    override fun writeHistory(prefs: SharedPreferences, tracks: ArrayList<Track>) {
         if (tracks.isNotEmpty() && tracks.count{it == tracks.last()} > 1) {
             val lastElement = tracks.last()
             tracks.remove(lastElement)

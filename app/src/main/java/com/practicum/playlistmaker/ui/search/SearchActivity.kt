@@ -22,10 +22,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.presentation.HISTORY_PREFS_KEY
-import com.practicum.playlistmaker.presentation.HISTORY_PREFS_NAME
+import com.practicum.playlistmaker.Creator
+import com.practicum.playlistmaker.domain.impl.HISTORY_PREFS_KEY
+import com.practicum.playlistmaker.domain.impl.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.presentation.SearchHistory
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.presentation.SearchHelper
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
@@ -39,8 +39,8 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchPlaceholderLayout: LinearLayout
     private lateinit var noInternetPlaceholderLayout: LinearLayout
     private lateinit var searchProgressBar: ProgressBar
-    private val history by lazy { SearchHistory() }
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
+    private val historyInteractor by lazy { Creator.provideHistoryInteractor(historyPrefs) }
     private var currentHistory: ArrayList<Track> = arrayListOf()
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { performSearch() }
@@ -50,7 +50,7 @@ class SearchActivity : AppCompatActivity() {
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
-                adapter.updateData(history.readHistory(prefs) ?: emptyList())
+                adapter.updateData(historyInteractor.getHistory() ?: emptyList())
                 setRecyclerHeight(true)
             }
         }
@@ -151,11 +151,11 @@ class SearchActivity : AppCompatActivity() {
         searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
         noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
         recycler = findViewById(R.id.search_recycler)
-        currentHistory = history.readHistory(historyPrefs) ?: arrayListOf()
+        currentHistory = historyInteractor.getHistory() ?: arrayListOf()
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
                 currentHistory.add(it)
-                history.writeHistory(historyPrefs, currentHistory)
+                historyInteractor.putHistory(currentHistory)
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra("Track", it)
                 startActivity(intent)
@@ -163,7 +163,7 @@ class SearchActivity : AppCompatActivity() {
         }
         recycler.adapter = adapter
         findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
-            history.writeHistory(historyPrefs, arrayListOf())
+            historyInteractor.putHistory(arrayListOf())
             currentHistory = arrayListOf()
             hideHistory()
         }
@@ -188,7 +188,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory() {
-        val history = history.readHistory(historyPrefs)
+        val history = historyInteractor.getHistory()
         if (history != null && history.isNotEmpty()) {
             adapter.updateData(history)
             historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)

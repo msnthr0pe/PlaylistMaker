@@ -1,9 +1,13 @@
 package com.practicum.playlistmaker
 
+import android.content.SharedPreferences
 import com.practicum.playlistmaker.data.TracksRepositoryImpl
 import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
+import com.practicum.playlistmaker.domain.api.HistoryInteractor
 import com.practicum.playlistmaker.domain.api.TracksInteractor
 import com.practicum.playlistmaker.domain.api.TracksRepository
+import com.practicum.playlistmaker.domain.impl.HistoryInteractorImpl
+import com.practicum.playlistmaker.domain.impl.HistoryRepositoryImpl
 import com.practicum.playlistmaker.domain.impl.TracksInteractorImpl
 
 object Creator {
@@ -13,5 +17,9 @@ object Creator {
 
     fun provideTracksInteractor(): TracksInteractor {
         return TracksInteractorImpl(getTracksRepository())
+    }
+
+    fun provideHistoryInteractor(prefs: SharedPreferences): HistoryInteractor {
+        return HistoryInteractorImpl(HistoryRepositoryImpl(), prefs)
     }
 }
