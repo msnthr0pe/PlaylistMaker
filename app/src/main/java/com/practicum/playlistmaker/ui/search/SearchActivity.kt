@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.search
 
 import android.content.Intent
 import android.content.SharedPreferences
@@ -22,9 +22,17 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.HISTORY_PREFS_KEY
+import com.practicum.playlistmaker.HISTORY_PREFS_NAME
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.SearchHistory
+import com.practicum.playlistmaker.data.dto.TrackSearchResponse
+import com.practicum.playlistmaker.data.network.RetrofitNetworkClient
+import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
-
 
 class SearchActivity : AppCompatActivity() {
 
@@ -206,7 +214,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun loadTracks() {
         searchProgressBar.isVisible = true
-        SearchRetrofit.searchMusicApi.search(text = lastSearchQuery).enqueue(object : retrofit2.Callback<TrackSearchResponse> {
+        RetrofitNetworkClient.searchMusicApi.search(text = lastSearchQuery).enqueue(object : Callback<TrackSearchResponse> {
             override fun onResponse(
                 call: Call<TrackSearchResponse?>,
                 response: Response<TrackSearchResponse?>,
