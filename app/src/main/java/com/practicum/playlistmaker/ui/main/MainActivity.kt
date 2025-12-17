@@ -26,11 +26,11 @@ class MainActivity : AppCompatActivity() {
         val itemClickListener: View.OnClickListener =
             View.OnClickListener { startActivity(Intent(this@MainActivity, SearchActivity::class.java)) }
 
-        val searchBtn = findViewById<Button>(R.id.search_btn).setOnClickListener(itemClickListener)
-        val mediaBtn = findViewById<Button>(R.id.media_btn).setOnClickListener {
+        findViewById<Button>(R.id.search_btn).setOnClickListener(itemClickListener)
+        findViewById<Button>(R.id.media_btn).setOnClickListener {
             startActivity(Intent(this, MediaActivity::class.java))
         }
-        val settingsBtn = findViewById<Button>(R.id.settings_btn).setOnClickListener {
+        findViewById<Button>(R.id.settings_btn).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
     }

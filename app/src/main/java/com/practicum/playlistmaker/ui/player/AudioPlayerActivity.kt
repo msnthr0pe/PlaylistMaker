@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.ui.player
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -14,24 +13,14 @@ import androidx.core.view.WindowInsetsCompat
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.practicum.playlistmaker.presentation.PlayerHelper
 
 class AudioPlayerActivity : AppCompatActivity() {
 
-    private enum class PlayerState {
-        DEFAULT,
-        PREPARED,
-        PLAYING,
-        PAUSED,
-    }
-
     private lateinit var playButton: ImageButton
-    private var isPlaying: Boolean = false
-    private var playerState: PlayerState = PlayerState.DEFAULT
-    private var mediaPlayer = MediaPlayer()
     private lateinit var currentTrackTime: TextView
     private var mainThreadHandler: Handler? = null
+    private var playerHelper = PlayerHelper()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,7 +50,15 @@ class AudioPlayerActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.genre_name).text = track.primaryGenreName
         findViewById<TextView>(R.id.country_name).text = track.country
         currentTrackTime = findViewById(R.id.current_track_time)
-        preparePlayer(track.previewUrl)
+        playerHelper.preparePlayer(
+            mainThreadHandler,
+            track.previewUrl,
+            {
+            playButton.isEnabled = true
+        },
+            {
+                setPlayButtonImage()
+            })
     }
 
     private fun setOnClickListeners() {
@@ -69,90 +66,32 @@ class AudioPlayerActivity : AppCompatActivity() {
             finish()
         }
         playButton = findViewById(R.id.play_button)
-        playButton.isEnabled = false
+        //playButton.isEnabled = false
         playButton.setOnClickListener {
-            isPlaying = !isPlaying
+            playerHelper.playbackControl { playbackPosition ->
+                currentTrackTime.text = playbackPosition
+            }
             setPlayButtonImage()
-            playbackControl()
         }
     }
 
     private fun setPlayButtonImage() {
         playButton.setImageResource(
-            if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+            if (playerHelper.isPlaying){
+                R.drawable.ic_pause
+            } else R.drawable.ic_play
         )
-    }
-
-    private fun preparePlayer(songUrl: String) {
-        mediaPlayer.setDataSource(songUrl)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            playButton.isEnabled = true
-            playerState = PlayerState.PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            playerState = PlayerState.PREPARED
-            mediaPlayer.seekTo(0)
-            isPlaying = false
-            setPlayButtonImage()
-        }
-    }
-
-    private fun startPlayer() {
-        mediaPlayer.start()
-        playerState = PlayerState.PLAYING
-        startHandler()
-    }
-
-    private fun startHandler() {
-        mainThreadHandler?.postDelayed(
-            object : Runnable {
-                override fun run() {
-                    val playbackPosition = SimpleDateFormat("m:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-                    currentTrackTime.text = playbackPosition
-                    mainThreadHandler?.postDelayed(
-                        this,
-                        PLAYBACK_PROGRESS_REFRESH_DELAY
-                    )
-                }
-            },
-            PLAYBACK_PROGRESS_REFRESH_DELAY
-        )
-    }
-
-    private fun pausePlayer() {
-        mediaPlayer.pause()
-        playerState = PlayerState.PAUSED
-        mainThreadHandler?.removeCallbacksAndMessages(null)
-    }
-
-    private fun playbackControl() {
-        when(playerState) {
-            PlayerState.PLAYING -> {
-                pausePlayer()
-            }
-            PlayerState.PREPARED, PlayerState.PAUSED -> {
-                startPlayer()
-            }
-            PlayerState.DEFAULT -> Unit
-        }
     }
 
     override fun onPause() {
         super.onPause()
-        isPlaying = false
+        playerHelper.onPause()
         setPlayButtonImage()
-        pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        isPlaying = false
+        playerHelper.onDestroy()
         setPlayButtonImage()
-        mediaPlayer.release()
-    }
-
-    companion object {
-        private const val PLAYBACK_PROGRESS_REFRESH_DELAY = 300L
     }
 }
