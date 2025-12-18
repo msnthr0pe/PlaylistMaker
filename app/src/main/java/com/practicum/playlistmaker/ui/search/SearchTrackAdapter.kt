@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.search
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,9 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.PlaylistUtil
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.domain.models.Track
 
 class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Unit) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
 
@@ -30,7 +33,8 @@ class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Un
         parent: ViewGroup,
         viewType: Int,
     ): SearchTrackViewHolder {
-        return  SearchTrackViewHolder(LayoutInflater.from(parent.context)
+        return  SearchTrackViewHolder(
+            LayoutInflater.from(parent.context)
             .inflate(R.layout.item_search, parent, false))
     }
 

@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker
+package com.practicum.playlistmaker.ui.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +8,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.practicum.playlistmaker.ui.media.MediaActivity
+import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.ui.search.SearchActivity
+import com.practicum.playlistmaker.ui.settings.SettingsActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -22,11 +26,11 @@ class MainActivity : AppCompatActivity() {
         val itemClickListener: View.OnClickListener =
             View.OnClickListener { startActivity(Intent(this@MainActivity, SearchActivity::class.java)) }
 
-        val searchBtn = findViewById<Button>(R.id.search_btn).setOnClickListener(itemClickListener)
-        val mediaBtn = findViewById<Button>(R.id.media_btn).setOnClickListener {
+        findViewById<Button>(R.id.search_btn).setOnClickListener(itemClickListener)
+        findViewById<Button>(R.id.media_btn).setOnClickListener {
             startActivity(Intent(this, MediaActivity::class.java))
         }
-        val settingsBtn = findViewById<Button>(R.id.settings_btn).setOnClickListener {
+        findViewById<Button>(R.id.settings_btn).setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
