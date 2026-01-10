@@ -9,12 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,13 +21,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.domain.search.history.impl.HISTORY_PREFS_KEY
 import com.practicum.playlistmaker.domain.search.history.impl.HISTORY_PREFS_NAME
-import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.search.viewmodel.SearchHelper
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
 
 class SearchActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivitySearchBinding
     private var searchText = ""
     private var lastSearchQuery = ""
     private lateinit var adapter: SearchTrackAdapter
@@ -59,8 +56,9 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_search)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -68,11 +66,10 @@ class SearchActivity : AppCompatActivity() {
 
         setupRecycler()
 
-        searchProgressBar = findViewById(R.id.search_progress_bar)
+        searchProgressBar = binding.searchProgressBar
 
-
-        val searchField = findViewById<EditText>(R.id.search_et)
-        val clearBtn = findViewById<ImageView>(R.id.clear_text_btn)
+        val searchField = binding.searchEt
+        val clearBtn = binding.clearTextBtn
 
         clearBtn.setOnClickListener {
             searchField.setText("")
@@ -87,7 +84,7 @@ class SearchActivity : AppCompatActivity() {
 
         clearBtn.visibility = View.GONE
 
-        findViewById<ImageView>(R.id.back_search_btn).setOnClickListener {
+        binding.backSearchBtn.setOnClickListener {
             finish()
         }
 
@@ -118,7 +115,7 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        findViewById<Button>(R.id.retry_search_button).setOnClickListener {
+        binding.retrySearchButton.setOnClickListener {
             setSearchPlaceholder(false)
             setNoInternetPlaceholder(false)
             loadTracks()
@@ -148,9 +145,10 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupRecycler() {
-        searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
-        noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
-        recycler = findViewById(R.id.search_recycler)
+        searchPlaceholderLayout = binding.searchPlaceholderLayout
+        noInternetPlaceholderLayout = binding.noInternetPlaceholderLayout
+        recycler = binding.searchRecycler
+
         currentHistory = historyInteractor.getHistory() ?: arrayListOf()
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
@@ -162,7 +160,7 @@ class SearchActivity : AppCompatActivity() {
             }
         }
         recycler.adapter = adapter
-        findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
+        binding.clearHistoryBtn.setOnClickListener {
             historyInteractor.putHistory(arrayListOf())
             currentHistory = arrayListOf()
             hideHistory()
@@ -193,8 +191,11 @@ class SearchActivity : AppCompatActivity() {
             adapter.updateData(history)
             historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
             setRecyclerHeight(true)
-            findViewById<TextView>(R.id.you_searched_for_text).isVisible = true
-            findViewById<Button>(R.id.clear_history_btn).isVisible = true
+            binding.apply {
+                youSearchedForText.isVisible = true
+                clearHistoryBtn.isVisible = true
+            }
+
         } else {
             adapter.updateData(emptyList())
         }
@@ -203,8 +204,10 @@ class SearchActivity : AppCompatActivity() {
     private fun hideHistory() {
         historyPrefs.unregisterOnSharedPreferenceChangeListener(prefsChangeListener)
         adapter.updateData(emptyList())
-        findViewById<TextView>(R.id.you_searched_for_text).isVisible = false
-        findViewById<Button>(R.id.clear_history_btn).isVisible = false
+        binding.apply {
+            youSearchedForText.isVisible = false
+            clearHistoryBtn.isVisible = false
+        }
         setRecyclerHeight(false)
     }
 
@@ -251,7 +254,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        findViewById<EditText>(R.id.search_et)
+        binding.searchEt
             .setText(savedInstanceState.getString(TEXT_KEY, DEFAULT_TEXT))
     }
 

@@ -7,16 +7,18 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.PlaylistUtil
-import com.practicum.playlistmaker.R
+import com.practicum.playlistmaker.databinding.ItemSearchBinding
 import com.practicum.playlistmaker.domain.models.Track
 
 class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Unit) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
 
+    private lateinit var binding: ItemSearchBinding
+
     inner class SearchTrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val trackNameText: TextView = itemView.findViewById(R.id.search_song_title)
-        val artistNameText: TextView = itemView.findViewById(R.id.search_artist_name)
-        val trackTime: TextView = itemView.findViewById(R.id.search_song_duration)
-        val artworkUrlImage: ImageView = itemView.findViewById(R.id.search_song_image)
+        val trackNameText: TextView = binding.searchSongTitle
+        val artistNameText: TextView = binding.searchArtistName
+        val trackTime: TextView = binding.searchSongDuration
+        val artworkUrlImage: ImageView = binding.searchSongImage
 
         fun bind(track: Track) {
             trackNameText.text = track.trackName
@@ -27,15 +29,17 @@ class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Un
                 onItemClick(track)
             }
         }
+
+
     }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
     ): SearchTrackViewHolder {
-        return  SearchTrackViewHolder(
-            LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_search, parent, false))
+        val inflater = LayoutInflater.from(parent.context)
+        binding = ItemSearchBinding.inflate(inflater, parent, false)
+        return  SearchTrackViewHolder(binding.root)
     }
 
     override fun onBindViewHolder(
