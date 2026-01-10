@@ -124,13 +124,18 @@
 
         <TextView
             android:id="@+id/duration_time"
-            android:layout_width="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:layout_marginStart="@dimen/small_margin"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/medium_margin"
             android:text="@string/default_time"
             android:textSize="13sp"
             app:layout_constraintBaseline_toBaselineOf="@id/duration_text"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/duration_text" />
 
         <TextView
             android:id="@+id/collection_text"
@@ -147,13 +152,18 @@
 
         <TextView
             android:id="@+id/collection_name"
-            android:layout_width="wrap_content"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:singleLine="true"
+            android:layout_marginStart="@dimen/small_margin"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/medium_margin"
             android:text="@string/default_value"
             android:textSize="13sp"
             app:layout_constraintBaseline_toBaselineOf="@id/collection_text"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/collection_text" />
 
         <TextView
             android:id="@+id/year_text"
@@ -170,13 +180,18 @@
 
         <TextView
             android:id="@+id/song_year"
-            android:layout_width="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:layout_marginStart="@dimen/small_margin"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/medium_margin"
             android:text="@string/default_value"
             android:textSize="13sp"
             app:layout_constraintBaseline_toBaselineOf="@id/year_text"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/year_text" />
 
         <TextView
             android:id="@+id/genre_text"
@@ -193,13 +208,18 @@
 
         <TextView
             android:id="@+id/genre_name"
-            android:layout_width="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:layout_marginStart="@dimen/small_margin"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/medium_margin"
             android:text="@string/default_value"
             android:textSize="13sp"
             app:layout_constraintBaseline_toBaselineOf="@id/genre_text"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/genre_text" />
 
         <TextView
             android:id="@+id/country_text"
@@ -216,13 +236,18 @@
 
         <TextView
             android:id="@+id/country_name"
-            android:layout_width="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:gravity="end"
+            android:layout_marginStart="@dimen/small_margin"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/medium_margin"
             android:text="@string/default_value"
             android:textSize="13sp"
             app:layout_constraintBaseline_toBaselineOf="@id/country_text"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/country_text" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
