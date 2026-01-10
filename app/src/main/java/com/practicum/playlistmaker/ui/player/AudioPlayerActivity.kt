@@ -14,7 +14,6 @@ import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.ui.player.viewmodel.PlayerHelper
 import com.practicum.playlistmaker.ui.player.viewmodel.PlayerViewModel
 
 class AudioPlayerActivity : AppCompatActivity() {
@@ -25,7 +24,6 @@ class AudioPlayerActivity : AppCompatActivity() {
     private lateinit var currentTrackTime: TextView
     private lateinit var track: Track
     private var mainThreadHandler: Handler? = null
-    private var playerHelper = PlayerHelper()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,8 +37,8 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
         mainThreadHandler = Handler(Looper.getMainLooper())
         setData()
-        //setViewModelObservers()
-        //preparePlayer()
+        setViewModelObservers()
+        preparePlayer()
         setOnClickListeners()
 
     }
@@ -66,16 +64,6 @@ class AudioPlayerActivity : AppCompatActivity() {
         }
 
         currentTrackTime = binding.currentTrackTime
-
-        playerHelper.preparePlayer(
-            mainThreadHandler,
-            track.previewUrl,
-            {
-            playButton.isEnabled = true
-        },
-            {
-                setPlayButtonImage()
-            })
     }
 
     private fun setViewModelObservers() {
@@ -99,7 +87,14 @@ class AudioPlayerActivity : AppCompatActivity() {
     }
 
     private fun preparePlayer() {
-        viewModel.preparePlayer(mainThreadHandler)
+        viewModel.preparePlayer(
+            mainThreadHandler,
+            {
+                playButton.isEnabled = true
+            },
+            {
+                setPlayButtonImage()
+            })
     }
 
     private fun setOnClickListeners() {
@@ -111,16 +106,13 @@ class AudioPlayerActivity : AppCompatActivity() {
         playButton = binding.playButton
         //playButton.isEnabled = false
         playButton.setOnClickListener {
-            playerHelper.playbackControl { playbackPosition ->
-                currentTrackTime.text = playbackPosition
-            }
-            setPlayButtonImage()
+            viewModel.playbackControl()
         }
     }
 
     private fun setPlayButtonImage() {
         playButton.setImageResource(
-            if (playerHelper.isPlaying){
+            if (viewModel.observePlaying().value == true){
                 R.drawable.ic_pause
             } else R.drawable.ic_play
         )
@@ -128,13 +120,11 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        playerHelper.onPause()
-        setPlayButtonImage()
+        viewModel.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        playerHelper.onDestroy()
-        setPlayButtonImage()
+        viewModel.onDestroy()
     }
 }

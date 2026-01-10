@@ -40,24 +40,26 @@ class PlayerViewModel(private val songUrl: String) : ViewModel() {
 
 
     fun preparePlayer(
-        handler: Handler?
+        handler: Handler?,
+        onPreparedAction: () -> Unit,
+        onCompletedAction: () -> Unit,
     ) {
         mainThreadHandler = handler
         mediaPlayer.setDataSource(songUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            playerStateLiveData.postValue(PlayerState.PREPARED)
+            onPreparedAction()
             internalPlayerState = InternalPlayerState.PREPARED
         }
         mediaPlayer.setOnCompletionListener {
             internalPlayerState = InternalPlayerState.PREPARED
             mediaPlayer.seekTo(0)
             _isPlaying.postValue(false)
-            playerStateLiveData.postValue(PlayerState.COMPLETED)
+            onCompletedAction()
         }
     }
 
-    private fun startPlayer(playbackPositionAction: (String) -> Unit) {
+    private fun startPlayer() {
         mediaPlayer.start()
         internalPlayerState = InternalPlayerState.PLAYING
 
@@ -65,7 +67,6 @@ class PlayerViewModel(private val songUrl: String) : ViewModel() {
             object : Runnable {
                 override fun run() {
                     val playbackPosition = SimpleDateFormat("m:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-                    playbackPositionAction(playbackPosition)
                     progressTimeLiveData.postValue(playbackPosition)
                     mainThreadHandler?.postDelayed(
                         this,
@@ -83,7 +84,7 @@ class PlayerViewModel(private val songUrl: String) : ViewModel() {
         mainThreadHandler?.removeCallbacksAndMessages(null)
     }
 
-    fun playbackControl(playbackPositionAction: (String) -> Unit) {
+    fun playbackControl() {
         _isPlaying.value?.let { _isPlaying.postValue(!it) }
 
         when(internalPlayerState) {
@@ -91,7 +92,7 @@ class PlayerViewModel(private val songUrl: String) : ViewModel() {
                 pausePlayer()
             }
             InternalPlayerState.PREPARED, InternalPlayerState.PAUSED -> {
-                startPlayer(playbackPositionAction)
+                startPlayer()
             }
             InternalPlayerState.DEFAULT -> Unit
         }
