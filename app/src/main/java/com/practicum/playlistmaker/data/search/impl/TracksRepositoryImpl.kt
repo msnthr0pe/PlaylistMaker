@@ -1,10 +1,10 @@
-package com.practicum.playlistmaker.data
+package com.practicum.playlistmaker.data.search.impl
 
-import com.practicum.playlistmaker.data.dto.TrackSearchRequest
-import com.practicum.playlistmaker.data.dto.TrackSearchResponse
-import com.practicum.playlistmaker.domain.api.TracksRepository
+import com.practicum.playlistmaker.data.search.network.NetworkClient
+import com.practicum.playlistmaker.data.search.dto.TrackSearchRequest
+import com.practicum.playlistmaker.data.search.dto.TrackSearchResponse
+import com.practicum.playlistmaker.domain.search.TracksRepository
 import com.practicum.playlistmaker.domain.models.Track
-import kotlin.String
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
     override fun searchForTracks(expression: String): List<Track>? {

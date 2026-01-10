@@ -1,9 +1,9 @@
-package com.practicum.playlistmaker.domain.impl
+package com.practicum.playlistmaker.domain.search.history.impl
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
 import androidx.core.content.edit
-import com.practicum.playlistmaker.domain.api.HistoryRepository
+import com.practicum.playlistmaker.domain.search.history.HistoryRepository
 import com.practicum.playlistmaker.domain.models.Track
 
 const val HISTORY_PREFS_NAME = "history_prefs"

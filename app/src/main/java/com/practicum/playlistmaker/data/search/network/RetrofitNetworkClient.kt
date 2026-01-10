@@ -1,8 +1,7 @@
-package com.practicum.playlistmaker.data.network
+package com.practicum.playlistmaker.data.search.network
 
-import com.practicum.playlistmaker.data.NetworkClient
-import com.practicum.playlistmaker.data.dto.Response
-import com.practicum.playlistmaker.data.dto.TrackSearchRequest
+import com.practicum.playlistmaker.data.search.dto.Response
+import com.practicum.playlistmaker.data.search.dto.TrackSearchRequest
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.lang.Exception

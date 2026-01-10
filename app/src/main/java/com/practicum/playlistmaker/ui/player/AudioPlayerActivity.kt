@@ -13,7 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.presentation.PlayerHelper
+import com.practicum.playlistmaker.ui.player.viewmodel.PlayerHelper
 
 class AudioPlayerActivity : AppCompatActivity() {
 

@@ -22,12 +22,12 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.Creator
-import com.practicum.playlistmaker.domain.impl.HISTORY_PREFS_KEY
-import com.practicum.playlistmaker.domain.impl.HISTORY_PREFS_NAME
+import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.domain.search.history.impl.HISTORY_PREFS_KEY
+import com.practicum.playlistmaker.domain.search.history.impl.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.presentation.SearchHelper
+import com.practicum.playlistmaker.ui.search.viewmodel.SearchHelper
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
 
 class SearchActivity : AppCompatActivity() {
