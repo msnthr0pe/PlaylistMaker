@@ -17,14 +17,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_KEY
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
-import com.practicum.playlistmaker.ui.search.viewmodel.SearchHelper
+import com.practicum.playlistmaker.ui.search.viewmodel.SearchViewModel
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
 
 class SearchActivity : AppCompatActivity() {
@@ -43,18 +43,35 @@ class SearchActivity : AppCompatActivity() {
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { performSearch() }
     private var isClickAllowed = true
+    private lateinit var viewModel: SearchViewModel
 
 
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
-                historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
-                    override fun consume(searchHistory: ArrayList<Track>?) {
-                        adapter.updateData(searchHistory ?: emptyList())
-                    }
-                })
-
+                viewModel.updateDisplayedTracks()
                 setRecyclerHeight(true)
+            }
+        }
+    }
+
+    private fun setViewModelObservers() {
+        with (viewModel) {
+            observeDisplayedTracks.observe(this@SearchActivity) {
+                adapter.updateData(it)
+            }
+            observeCurrentHistory.observe(this@SearchActivity) {
+                currentHistory = ArrayList(it)
+            }
+            observePlaceholdersState.observe(this@SearchActivity) {
+                setSearchPlaceholder(it.searchPlaceholderVisible)
+                setNoInternetPlaceholder(it.noInternetPlaceholderVisible)
+            }
+            observeHistoryEnablement.observe(this@SearchActivity) {
+                binding.apply {
+                    youSearchedForText.isVisible = it
+                    clearHistoryBtn.isVisible = it
+                }
             }
         }
     }
@@ -62,6 +79,11 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        val factory = SearchViewModel.getFactory(historyInteractor)
+        viewModel = ViewModelProvider(this, factory)[SearchViewModel::class.java]
+        setViewModelObservers()
+
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
@@ -100,7 +122,7 @@ class SearchActivity : AppCompatActivity() {
                 hideHistory()
             } else {
                 showHistory()
-                setSearchPlaceholder(false)
+                viewModel.updatePlaceholdersState(search = false, noInternet = false)
                 clearBtn.isVisible = false
             }
             searchText = searchField.text.toString()
@@ -122,8 +144,7 @@ class SearchActivity : AppCompatActivity() {
         }
 
         binding.retrySearchButton.setOnClickListener {
-            setSearchPlaceholder(false)
-            setNoInternetPlaceholder(false)
+            viewModel.updatePlaceholdersState(search = false, noInternet = false)
             loadTracks()
         }
     }
@@ -134,8 +155,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun performSearch() {
-        setSearchPlaceholder(false)
-        setNoInternetPlaceholder(false)
+        viewModel.updatePlaceholdersState(search = false, noInternet = false)
         if (searchText.isEmpty()) return
         lastSearchQuery = searchText
         loadTracks()
@@ -155,15 +175,11 @@ class SearchActivity : AppCompatActivity() {
         noInternetPlaceholderLayout = binding.noInternetPlaceholderLayout
         recycler = binding.searchRecycler
 
-        historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
-            override fun consume(searchHistory: ArrayList<Track>?) {
-                currentHistory = searchHistory ?: arrayListOf()
-            }
-        })
+        viewModel.updateCurrentHistory()
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
                 currentHistory.add(it)
-                historyInteractor.saveToHistory(currentHistory)
+                viewModel.putHistory(currentHistory)
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra("Track", it)
                 startActivity(intent)
@@ -171,8 +187,8 @@ class SearchActivity : AppCompatActivity() {
         }
         recycler.adapter = adapter
         binding.clearHistoryBtn.setOnClickListener {
-            historyInteractor.saveToHistory(arrayListOf())
-            currentHistory = arrayListOf()
+            viewModel.putHistory(arrayListOf())
+            viewModel.updateCurrentHistory()
             hideHistory()
         }
 
@@ -196,57 +212,26 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory() {
-        var history: ArrayList<Track>? = null
-        historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
-            override fun consume(searchHistory: ArrayList<Track>?) {
-                history = searchHistory ?: arrayListOf()
-            }
-        })
-        if (history != null && history.isNotEmpty()) {
-            adapter.updateData(history)
+        viewModel.showHistory {
             historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
             setRecyclerHeight(true)
-            binding.apply {
-                youSearchedForText.isVisible = true
-                clearHistoryBtn.isVisible = true
-            }
-
-        } else {
-            adapter.updateData(emptyList())
+            viewModel.updateHistoryEnablement(true)
         }
     }
 
     private fun hideHistory() {
         historyPrefs.unregisterOnSharedPreferenceChangeListener(prefsChangeListener)
-        adapter.updateData(emptyList())
-        binding.apply {
-            youSearchedForText.isVisible = false
-            clearHistoryBtn.isVisible = false
-        }
+
+        viewModel.updateDisplayedTracks(arrayListOf())
+        viewModel.updateHistoryEnablement(false)
+
         setRecyclerHeight(false)
     }
 
     private fun loadTracks() {
         searchProgressBar.isVisible = true
-
-        SearchHelper.getTracks(
-            lastSearchQuery,
-        ) { foundTracks ->
+        viewModel.loadTracks(lastSearchQuery) {
             searchProgressBar.isVisible = false
-
-            if (foundTracks == null) {
-                searchProgressBar.isVisible = false
-                setNoInternetPlaceholder(true)
-                adapter.updateData(emptyList())
-                return@getTracks
-            }
-
-            if (foundTracks.isNotEmpty()) {
-                adapter.updateData(foundTracks)
-            } else {
-                setSearchPlaceholder(true)
-                adapter.updateData(emptyList())
-            }
         }
     }
 
