@@ -8,6 +8,6 @@ interface SearchHistoryInteractor {
     fun saveToHistory(tracks: ArrayList<Track>)
 
     interface HistoryConsumer {
-        fun consume(searchHistory: List<Track>?)
+        fun consume(searchHistory: ArrayList<Track>?)
     }
 }

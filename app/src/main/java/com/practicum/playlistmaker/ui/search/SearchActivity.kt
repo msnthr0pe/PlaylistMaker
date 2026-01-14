@@ -23,6 +23,7 @@ import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_KEY
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
 import com.practicum.playlistmaker.ui.search.viewmodel.SearchHelper
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
 
@@ -37,7 +38,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noInternetPlaceholderLayout: LinearLayout
     private lateinit var searchProgressBar: ProgressBar
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
-    private val historyInteractor by lazy { Creator.provideHistoryInteractor(historyPrefs) }
+    private val historyInteractor by lazy { Creator.provideSearchHistoryInteractor(this) }
     private var currentHistory: ArrayList<Track> = arrayListOf()
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { performSearch() }
@@ -47,7 +48,12 @@ class SearchActivity : AppCompatActivity() {
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
-                adapter.updateData(historyInteractor.getHistory() ?: emptyList())
+                historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
+                    override fun consume(searchHistory: ArrayList<Track>?) {
+                        adapter.updateData(searchHistory ?: emptyList())
+                    }
+                })
+
                 setRecyclerHeight(true)
             }
         }
@@ -149,11 +155,15 @@ class SearchActivity : AppCompatActivity() {
         noInternetPlaceholderLayout = binding.noInternetPlaceholderLayout
         recycler = binding.searchRecycler
 
-        currentHistory = historyInteractor.getHistory() ?: arrayListOf()
+        historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
+            override fun consume(searchHistory: ArrayList<Track>?) {
+                currentHistory = searchHistory ?: arrayListOf()
+            }
+        })
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
                 currentHistory.add(it)
-                historyInteractor.putHistory(currentHistory)
+                historyInteractor.saveToHistory(currentHistory)
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra("Track", it)
                 startActivity(intent)
@@ -161,7 +171,7 @@ class SearchActivity : AppCompatActivity() {
         }
         recycler.adapter = adapter
         binding.clearHistoryBtn.setOnClickListener {
-            historyInteractor.putHistory(arrayListOf())
+            historyInteractor.saveToHistory(arrayListOf())
             currentHistory = arrayListOf()
             hideHistory()
         }
@@ -186,7 +196,12 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory() {
-        val history = historyInteractor.getHistory()
+        var history: ArrayList<Track>? = null
+        historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
+            override fun consume(searchHistory: ArrayList<Track>?) {
+                history = searchHistory ?: arrayListOf()
+            }
+        })
         if (history != null && history.isNotEmpty()) {
             adapter.updateData(history)
             historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)

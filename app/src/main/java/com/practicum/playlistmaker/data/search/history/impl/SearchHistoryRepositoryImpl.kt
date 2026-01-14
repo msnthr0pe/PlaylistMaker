@@ -13,8 +13,8 @@ class SearchHistoryRepositoryImpl(
         storage.storeData(tracks)
     }
 
-    override fun getHistory(): Resource<List<Track>> {
-        val tracks = storage.getData() ?: listOf()
-        return Resource.Success(tracks.reversed())
+    override fun getHistory(): Resource.Success<ArrayList<Track>> {
+        val tracks = storage.getData() ?: arrayListOf()
+        return Resource.Success(tracks.apply { reverse() })
     }
 }
