@@ -7,6 +7,9 @@ import com.google.gson.Gson
 import com.practicum.playlistmaker.data.search.network.StorageClient
 import java.lang.reflect.Type
 
+const val HISTORY_PREFS_NAME = "history_prefs"
+const val HISTORY_PREFS_KEY = "history"
+
 class PrefsStorageClient<T>(
     context: Context,
     private val dataKey: String,
@@ -28,8 +31,4 @@ class PrefsStorageClient<T>(
             gson.fromJson(dataJson, type)
         }
     }
-    companion object {
-        const val HISTORY_PREFS_NAME = "history_prefs"
-    }
-
 }

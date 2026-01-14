@@ -1,21 +1,17 @@
 package com.practicum.playlistmaker.creator
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_KEY
-import com.practicum.playlistmaker.data.search.history.impl.HistoryRepositoryImpl
 import com.practicum.playlistmaker.data.search.history.impl.PrefsStorageClient
 import com.practicum.playlistmaker.data.search.history.impl.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.data.search.impl.TracksRepositoryImpl
 import com.practicum.playlistmaker.data.search.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.domain.api.SearchHistoryRepository
 import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.domain.search.history.HistoryInteractor
 import com.practicum.playlistmaker.domain.search.TracksInteractor
 import com.practicum.playlistmaker.domain.search.TracksRepository
 import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
-import com.practicum.playlistmaker.domain.search.history.impl.HistoryInteractorImpl
 import com.practicum.playlistmaker.domain.search.history.impl.SearchHistoryInteractorImpl
 import com.practicum.playlistmaker.domain.search.impl.TracksInteractorImpl
 
@@ -26,10 +22,6 @@ object Creator {
 
     fun provideTracksInteractor(): TracksInteractor {
         return TracksInteractorImpl(getTracksRepository())
-    }
-
-    fun provideHistoryInteractor(prefs: SharedPreferences): HistoryInteractor {
-        return HistoryInteractorImpl(HistoryRepositoryImpl(), prefs)
     }
 
     private fun getSearchHistoryRepository(context: Context): SearchHistoryRepository {
