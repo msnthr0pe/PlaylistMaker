@@ -19,8 +19,8 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.creator.Creator
-import com.practicum.playlistmaker.domain.search.history.impl.HISTORY_PREFS_KEY
-import com.practicum.playlistmaker.domain.search.history.impl.HISTORY_PREFS_NAME
+import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_KEY
+import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.search.viewmodel.SearchHelper

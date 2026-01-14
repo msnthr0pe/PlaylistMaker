@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.domain.search.history.impl
+package com.practicum.playlistmaker.data.search.history.impl
 
 import android.content.SharedPreferences
 import com.google.gson.Gson
