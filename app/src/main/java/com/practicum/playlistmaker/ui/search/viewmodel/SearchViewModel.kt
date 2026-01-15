@@ -11,6 +11,7 @@ import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.search.TracksInteractor
 import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
 import com.practicum.playlistmaker.ui.search.models.PlaceholdersState
+import com.practicum.playlistmaker.ui.search.models.SearchState
 import kotlin.collections.isNotEmpty
 
 class SearchViewModel(
@@ -18,16 +19,22 @@ class SearchViewModel(
 ) : ViewModel() {
     private val displayedTracks = MutableLiveData<List<Track>>(emptyList())
     val observeDisplayedTracks: LiveData<List<Track>> = displayedTracks
-
-    private val placeholdersState = MutableLiveData(
-        PlaceholdersState(searchPlaceholderVisible = false, noInternetPlaceholderVisible = false)
-    )
-    val observePlaceholdersState: LiveData<PlaceholdersState> = placeholdersState
-
-    private val isHistoryEnabled = MutableLiveData(false)
-    val observeHistoryEnablement: LiveData<Boolean> = isHistoryEnabled
-
     var history = ArrayList<Track>()
+
+    private val searchState = MutableLiveData(
+        SearchState(
+            PlaceholdersState
+                (
+                searchPlaceholderVisible = false,
+                noInternetPlaceholderVisible = false
+                        ),
+            false,
+        )
+    )
+    val observeSearchState: LiveData<SearchState> = searchState
+
+    private var isHistory= false
+    private var placeholders = PlaceholdersState(false, false)
 
     fun getTracks(query: String, callback: (List<Track>?) -> Unit) {
         val tracksInteractor = Creator.provideTracksInteractor()
@@ -56,10 +63,6 @@ class SearchViewModel(
             history = it
         }
     }
-    fun updateAll() {
-        updateCurrentHistory()
-        updateDisplayedTracks()
-    }
 
     private fun update(callback: (ArrayList<Track>) -> Unit){
         historyInteractor.getHistory(object : SearchHistoryInteractor.HistoryConsumer {
@@ -67,10 +70,6 @@ class SearchViewModel(
                 callback(searchHistory ?: arrayListOf())
             }
         })
-    }
-
-    fun putHistory(tracks: ArrayList<Track>) {
-        historyInteractor.saveToHistory(tracks)
     }
 
     fun addHistory(tracks: ArrayList<Track>? = null) {
@@ -117,13 +116,26 @@ class SearchViewModel(
     }
 
     fun updateHistoryEnablement(isEnabled: Boolean) {
-        isHistoryEnabled.postValue(isEnabled)
+        isHistory = isEnabled
+        searchState.postValue(
+            SearchState(
+                placeholders,
+                isHistory,
+            )
+        )
     }
 
     fun updatePlaceholdersState(search: Boolean, noInternet: Boolean) {
-        placeholdersState.postValue(PlaceholdersState(
-            search, noInternet
-        ))
+        placeholders = PlaceholdersState(
+            search,
+            noInternet
+        )
+        searchState.postValue(
+            SearchState(
+                placeholders,
+                isHistory,
+            )
+        )
     }
 
     companion object {

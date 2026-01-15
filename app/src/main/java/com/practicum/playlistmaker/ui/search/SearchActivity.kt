@@ -58,14 +58,12 @@ class SearchActivity : AppCompatActivity() {
             observeDisplayedTracks.observe(this@SearchActivity) {
                 adapter.updateData(it.reversed())
             }
-            observePlaceholdersState.observe(this@SearchActivity) {
-                setSearchPlaceholder(it.searchPlaceholderVisible)
-                setNoInternetPlaceholder(it.noInternetPlaceholderVisible)
-            }
-            observeHistoryEnablement.observe(this@SearchActivity) {
+            observeSearchState.observe(this@SearchActivity) {
+                setSearchPlaceholder(it.placeholdersState.searchPlaceholderVisible)
+                setNoInternetPlaceholder(it.placeholdersState.noInternetPlaceholderVisible)
                 binding.apply {
-                    youSearchedForText.isVisible = it
-                    clearHistoryBtn.isVisible = it
+                    youSearchedForText.isVisible = it.isHistoryEnabled
+                    clearHistoryBtn.isVisible = it.isHistoryEnabled
                 }
             }
         }
@@ -173,9 +171,7 @@ class SearchActivity : AppCompatActivity() {
         viewModel.updateCurrentHistory()
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
-                //currentHistory.add(it)
                 viewModel.history.add(it)
-                //viewModel.putHistory(currentHistory)
                 viewModel.addHistory()
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra("Track", it)
