@@ -7,6 +7,7 @@ import com.practicum.playlistmaker.data.search.history.impl.PrefsStorageClient
 import com.practicum.playlistmaker.data.search.history.impl.SearchHistoryRepositoryImpl
 import com.practicum.playlistmaker.data.search.impl.TracksRepositoryImpl
 import com.practicum.playlistmaker.data.search.network.RetrofitNetworkClient
+import com.practicum.playlistmaker.data.theme.ThemeEditorClient
 import com.practicum.playlistmaker.domain.api.SearchHistoryRepository
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.search.TracksInteractor
@@ -32,6 +33,10 @@ object Creator {
                 object : TypeToken<ArrayList<Track>>() {}.type
             )
         )
+    }
+
+    fun provideThemeEditor(context: Context): ThemeEditorClient {
+        return ThemeEditorClient(context)
     }
 
     fun provideSearchHistoryInteractor(context: Context): SearchHistoryInteractor {

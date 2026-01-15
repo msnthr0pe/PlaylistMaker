@@ -28,7 +28,7 @@ class SettingsActivity : AppCompatActivity() {
             insets
         }
 
-        val isDarkThemeEnabled = (applicationContext as PlaylistMakerApp).isDark
+        val isDarkThemeEnabled = (applicationContext as PlaylistMakerApp).isDarkThemeEnabled()
 
         val darkThemeSwitch = binding.darkThemeSwitch
 
