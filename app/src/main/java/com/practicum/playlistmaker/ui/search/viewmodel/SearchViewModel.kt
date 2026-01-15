@@ -1,6 +1,5 @@
 package com.practicum.playlistmaker.ui.search.viewmodel
 
-import androidx.core.view.isVisible
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +11,8 @@ import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.search.TracksInteractor
 import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
 import com.practicum.playlistmaker.ui.search.models.PlaceholdersState
+import com.practicum.playlistmaker.ui.search.models.SearchState
+import com.practicum.playlistmaker.ui.search.models.TracksState
 import kotlin.collections.isNotEmpty
 
 class SearchViewModel(
@@ -30,6 +31,25 @@ class SearchViewModel(
 
     private val isHistoryEnabled = MutableLiveData(false)
     val observeHistoryEnablement: LiveData<Boolean> = isHistoryEnabled
+
+    private val searchState = MutableLiveData(
+        SearchState(
+            false,
+            PlaceholdersState(
+                searchPlaceholderVisible = false,
+                noInternetPlaceholderVisible = false
+            )
+        )
+    )
+    val observeSearchState: LiveData<SearchState> = searchState
+
+    private val tracksState = MutableLiveData(
+        TracksState(
+        arrayListOf(),
+        arrayListOf()
+        )
+    )
+    val observeTracksState: LiveData<TracksState> = tracksState
 
     fun getTracks(query: String, callback: (List<Track>?) -> Unit) {
         val tracksInteractor = Creator.provideTracksInteractor()

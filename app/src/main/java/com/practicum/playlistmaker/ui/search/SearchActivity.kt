@@ -58,7 +58,7 @@ class SearchActivity : AppCompatActivity() {
     private fun setViewModelObservers() {
         with (viewModel) {
             observeDisplayedTracks.observe(this@SearchActivity) {
-                adapter.updateData(it)
+                adapter.updateData(it.reversed())
             }
             observeCurrentHistory.observe(this@SearchActivity) {
                 currentHistory = ArrayList(it)
