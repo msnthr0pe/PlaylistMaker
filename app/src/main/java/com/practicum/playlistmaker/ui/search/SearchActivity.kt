@@ -23,7 +23,6 @@ import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_KEY
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
-import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.search.viewmodel.SearchViewModel
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
 
@@ -39,7 +38,6 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchProgressBar: ProgressBar
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
     private val historyInteractor by lazy { Creator.provideSearchHistoryInteractor(this) }
-    private var currentHistory: ArrayList<Track> = arrayListOf()
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { performSearch() }
     private var isClickAllowed = true
@@ -59,9 +57,6 @@ class SearchActivity : AppCompatActivity() {
         with (viewModel) {
             observeDisplayedTracks.observe(this@SearchActivity) {
                 adapter.updateData(it.reversed())
-            }
-            observeCurrentHistory.observe(this@SearchActivity) {
-                currentHistory = ArrayList(it)
             }
             observePlaceholdersState.observe(this@SearchActivity) {
                 setSearchPlaceholder(it.searchPlaceholderVisible)
@@ -178,8 +173,10 @@ class SearchActivity : AppCompatActivity() {
         viewModel.updateCurrentHistory()
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
-                currentHistory.add(it)
-                viewModel.putHistory(currentHistory)
+                //currentHistory.add(it)
+                viewModel.history.add(it)
+                //viewModel.putHistory(currentHistory)
+                viewModel.addHistory()
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra("Track", it)
                 startActivity(intent)
@@ -187,7 +184,7 @@ class SearchActivity : AppCompatActivity() {
         }
         recycler.adapter = adapter
         binding.clearHistoryBtn.setOnClickListener {
-            viewModel.putHistory(arrayListOf())
+            viewModel.addHistory(arrayListOf())
             viewModel.updateCurrentHistory()
             hideHistory()
         }
@@ -197,7 +194,7 @@ class SearchActivity : AppCompatActivity() {
     private fun setRecyclerHeight(isHistory: Boolean) {
         if (isHistory) {
             var heightInDp = 180
-            val currentHistorySize = currentHistory.size
+            val currentHistorySize = viewModel.history.size
             if (currentHistorySize > 0 && currentHistorySize < 3) {
                 heightInDp = 60 * currentHistorySize
             }
