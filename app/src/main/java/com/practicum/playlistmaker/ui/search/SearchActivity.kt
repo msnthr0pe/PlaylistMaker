@@ -41,6 +41,7 @@ class SearchActivity : AppCompatActivity() {
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { performSearch() }
     private var isClickAllowed = true
+    private var tracksSize = 0
     private lateinit var viewModel: SearchViewModel
 
 
@@ -55,12 +56,13 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setViewModelObservers() {
         with (viewModel) {
-            observeDisplayedTracks.observe(this@SearchActivity) {
-                adapter.updateData(it.reversed())
-            }
             observeSearchState.observe(this@SearchActivity) {
+                adapter.updateData(it.displayedTracks.reversed())
+                tracksSize = it.displayedTracks.size
+
                 setSearchPlaceholder(it.placeholdersState.searchPlaceholderVisible)
                 setNoInternetPlaceholder(it.placeholdersState.noInternetPlaceholderVisible)
+                setRecyclerHeight(it.isHistoryEnabled)
                 binding.apply {
                     youSearchedForText.isVisible = it.isHistoryEnabled
                     clearHistoryBtn.isVisible = it.isHistoryEnabled
@@ -125,12 +127,15 @@ class SearchActivity : AppCompatActivity() {
         searchField.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 showHistory()
+                viewModel.updatePlaceholdersState(search = false, noInternet = false)
             }
         }
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                performSearch()
+                hideHistory()
+                handler.removeCallbacks(searchRunnable)
+                handler.post(searchRunnable)
                 true
             }
             false
@@ -171,7 +176,7 @@ class SearchActivity : AppCompatActivity() {
         viewModel.updateCurrentHistory()
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
-                viewModel.history.add(it)
+                viewModel.addToHistory(it)
                 viewModel.addHistory()
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra("Track", it)
@@ -190,7 +195,7 @@ class SearchActivity : AppCompatActivity() {
     private fun setRecyclerHeight(isHistory: Boolean) {
         if (isHistory) {
             var heightInDp = 180
-            val currentHistorySize = viewModel.history.size
+            val currentHistorySize = tracksSize
             if (currentHistorySize > 0 && currentHistorySize < 3) {
                 heightInDp = 60 * currentHistorySize
             }
@@ -207,7 +212,6 @@ class SearchActivity : AppCompatActivity() {
     private fun showHistory() {
         viewModel.showHistory {
             historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
-            setRecyclerHeight(true)
             viewModel.updateHistoryEnablement(true)
         }
     }
@@ -217,8 +221,6 @@ class SearchActivity : AppCompatActivity() {
 
         viewModel.updateDisplayedTracks(arrayListOf())
         viewModel.updateHistoryEnablement(false)
-
-        setRecyclerHeight(false)
     }
 
     private fun loadTracks() {
