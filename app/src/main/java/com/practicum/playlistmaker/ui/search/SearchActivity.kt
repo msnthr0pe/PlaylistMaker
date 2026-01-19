@@ -64,8 +64,20 @@ class SearchActivity : AppCompatActivity() {
                 setNoInternetPlaceholder(it.placeholdersState.noInternetPlaceholderVisible)
                 setRecyclerHeight(it.isHistoryEnabled)
                 binding.apply {
-                    youSearchedForText.isVisible = it.isHistoryEnabled
-                    clearHistoryBtn.isVisible = it.isHistoryEnabled
+                    if (tracksSize == 0) {
+                        youSearchedForText.isVisible = false
+                        clearHistoryBtn.isVisible = false
+                    } else {
+                        youSearchedForText.isVisible = it.isHistoryEnabled
+                        clearHistoryBtn.isVisible = it.isHistoryEnabled
+                    }
+                }
+                if (it.displayedTracks.isNotEmpty() ||
+                    it.placeholdersState.searchPlaceholderVisible ||
+                    it.placeholdersState.noInternetPlaceholderVisible ||
+                    it.isHistoryEnabled
+                    ) {
+                    searchProgressBar.isVisible = false
                 }
             }
         }
@@ -210,10 +222,9 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory() {
-        viewModel.showHistory {
-            historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
-            viewModel.updateHistoryEnablement(true)
-        }
+        viewModel.showHistory()
+        historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
+        viewModel.updateHistoryEnablement(true)
     }
 
     private fun hideHistory() {
@@ -225,9 +236,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun loadTracks() {
         searchProgressBar.isVisible = true
-        viewModel.loadTracks(lastSearchQuery) {
-            searchProgressBar.isVisible = false
-        }
+        viewModel.loadTracks(lastSearchQuery)
     }
 
     private fun setSearchPlaceholder(isVisible: Boolean) {

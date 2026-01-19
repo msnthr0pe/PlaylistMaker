@@ -99,26 +99,22 @@ class SearchViewModel(
         history.add(track)
     }
 
-    fun showHistory(ifHistory: () -> Unit) {
+    fun showHistory() {
         var history: ArrayList<Track>? = null
         update { history = it }
         if (history != null && history.isNotEmpty()) {
             updateDisplayedTracks(history)
-
-            ifHistory()
         } else {
             updateDisplayedTracks(arrayListOf())
         }
     }
 
-     fun loadTracks(lastSearchQuery: String, onFound: () -> Unit) {
+     fun loadTracks(lastSearchQuery: String) {
         getTracks(
             lastSearchQuery,
         ) { foundTracks ->
-            onFound()
 
             if (foundTracks == null) {
-                onFound()
                 updatePlaceholdersState(search = false, noInternet = true)
 
                 updateDisplayedTracks(arrayListOf())
