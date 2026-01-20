@@ -42,11 +42,11 @@ val dataModule = module {
     factory { Gson() }
 
     factory<StorageClient<ArrayList<Track>>> {
-        PrefsStorageClient(get(), HISTORY_PREFS_KEY, get())
+        PrefsStorageClient(HISTORY_PREFS_KEY, get(), get(), get())
     }
 
     single<NetworkClient> {
-        RetrofitNetworkClient
+        RetrofitNetworkClient(get())
     }
 
     single<ThemeEditorClient> {

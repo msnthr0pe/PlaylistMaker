@@ -1,18 +1,22 @@
 package com.practicum.playlistmaker.ui.search.viewmodel
 
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.practicum.playlistmaker.di.HISTORY_PREFS_KEY
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.search.TracksInteractor
 import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
 import com.practicum.playlistmaker.ui.search.models.SearchState
 import com.practicum.playlistmaker.ui.search.models.PlaceholdersState
 import kotlin.collections.isNotEmpty
+import kotlin.getValue
 
 class SearchViewModel(
     private val historyInteractor: SearchHistoryInteractor,
     private val tracksInteractor: TracksInteractor,
+    private val historyPrefs: SharedPreferences,
 ) : ViewModel() {
 
     private var history = ArrayList<Track>()
@@ -36,6 +40,22 @@ class SearchViewModel(
         searchPlaceholderVisible = false,
         noInternetPlaceholderVisible = false
     )
+
+    private val prefsChangeListener by lazy {
+        SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
+            if (key == HISTORY_PREFS_KEY) {
+                updateDisplayedTracks()
+            }
+        }
+    }
+
+    fun registerPrefsChangeListener() {
+        historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
+    }
+
+    fun unregisterPrefsChangeListener() {
+        historyPrefs.unregisterOnSharedPreferenceChangeListener(prefsChangeListener)
+    }
 
     fun getTracks(query: String, callback: (List<Track>?) -> Unit) {
         tracksInteractor.searchForTracks(
