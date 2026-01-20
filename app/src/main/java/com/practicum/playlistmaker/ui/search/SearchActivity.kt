@@ -9,29 +9,26 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.Creator
-import com.practicum.playlistmaker.domain.impl.HISTORY_PREFS_KEY
-import com.practicum.playlistmaker.domain.impl.HISTORY_PREFS_NAME
-import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.domain.models.Track
-import com.practicum.playlistmaker.presentation.SearchHelper
+import com.practicum.playlistmaker.creator.Creator
+import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_KEY
+import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_NAME
+import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.ui.search.viewmodel.SearchViewModel
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
 
 class SearchActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivitySearchBinding
     private var searchText = ""
     private var lastSearchQuery = ""
     private lateinit var adapter: SearchTrackAdapter
@@ -40,18 +37,48 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noInternetPlaceholderLayout: LinearLayout
     private lateinit var searchProgressBar: ProgressBar
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
-    private val historyInteractor by lazy { Creator.provideHistoryInteractor(historyPrefs) }
-    private var currentHistory: ArrayList<Track> = arrayListOf()
+    private val historyInteractor by lazy { Creator.provideSearchHistoryInteractor(this) }
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { performSearch() }
     private var isClickAllowed = true
+    private var tracksSize = 0
+    private lateinit var viewModel: SearchViewModel
 
 
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
             if (key == HISTORY_PREFS_KEY) {
-                adapter.updateData(historyInteractor.getHistory() ?: emptyList())
+                viewModel.updateDisplayedTracks()
                 setRecyclerHeight(true)
+            }
+        }
+    }
+
+    private fun setViewModelObservers() {
+        with (viewModel) {
+            observeSearchState.observe(this@SearchActivity) {
+                adapter.updateData(it.displayedTracks.reversed())
+                tracksSize = it.displayedTracks.size
+
+                setSearchPlaceholder(it.placeholdersState.searchPlaceholderVisible)
+                setNoInternetPlaceholder(it.placeholdersState.noInternetPlaceholderVisible)
+                setRecyclerHeight(it.isHistoryEnabled)
+                binding.apply {
+                    if (tracksSize == 0) {
+                        youSearchedForText.isVisible = false
+                        clearHistoryBtn.isVisible = false
+                    } else {
+                        youSearchedForText.isVisible = it.isHistoryEnabled
+                        clearHistoryBtn.isVisible = it.isHistoryEnabled
+                    }
+                }
+                if (it.displayedTracks.isNotEmpty() ||
+                    it.placeholdersState.searchPlaceholderVisible ||
+                    it.placeholdersState.noInternetPlaceholderVisible ||
+                    it.isHistoryEnabled
+                    ) {
+                    searchProgressBar.isVisible = false
+                }
             }
         }
     }
@@ -59,8 +86,14 @@ class SearchActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_search)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+
+        val factory = SearchViewModel.getFactory(historyInteractor)
+        viewModel = ViewModelProvider(this, factory)[SearchViewModel::class.java]
+        setViewModelObservers()
+
+        binding = ActivitySearchBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
@@ -68,11 +101,10 @@ class SearchActivity : AppCompatActivity() {
 
         setupRecycler()
 
-        searchProgressBar = findViewById(R.id.search_progress_bar)
+        searchProgressBar = binding.searchProgressBar
 
-
-        val searchField = findViewById<EditText>(R.id.search_et)
-        val clearBtn = findViewById<ImageView>(R.id.clear_text_btn)
+        val searchField = binding.searchEt
+        val clearBtn = binding.clearTextBtn
 
         clearBtn.setOnClickListener {
             searchField.setText("")
@@ -87,7 +119,7 @@ class SearchActivity : AppCompatActivity() {
 
         clearBtn.visibility = View.GONE
 
-        findViewById<ImageView>(R.id.back_search_btn).setOnClickListener {
+        binding.backSearchBtn.setOnClickListener {
             finish()
         }
 
@@ -97,7 +129,7 @@ class SearchActivity : AppCompatActivity() {
                 hideHistory()
             } else {
                 showHistory()
-                setSearchPlaceholder(false)
+                viewModel.updatePlaceholdersState(search = false, noInternet = false)
                 clearBtn.isVisible = false
             }
             searchText = searchField.text.toString()
@@ -107,20 +139,22 @@ class SearchActivity : AppCompatActivity() {
         searchField.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
                 showHistory()
+                viewModel.updatePlaceholdersState(search = false, noInternet = false)
             }
         }
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                performSearch()
+                hideHistory()
+                handler.removeCallbacks(searchRunnable)
+                handler.post(searchRunnable)
                 true
             }
             false
         }
 
-        findViewById<Button>(R.id.retry_search_button).setOnClickListener {
-            setSearchPlaceholder(false)
-            setNoInternetPlaceholder(false)
+        binding.retrySearchButton.setOnClickListener {
+            viewModel.updatePlaceholdersState(search = false, noInternet = false)
             loadTracks()
         }
     }
@@ -131,8 +165,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun performSearch() {
-        setSearchPlaceholder(false)
-        setNoInternetPlaceholder(false)
+        viewModel.updatePlaceholdersState(search = false, noInternet = false)
         if (searchText.isEmpty()) return
         lastSearchQuery = searchText
         loadTracks()
@@ -148,23 +181,24 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupRecycler() {
-        searchPlaceholderLayout = findViewById(R.id.search_placeholder_layout)
-        noInternetPlaceholderLayout = findViewById(R.id.no_internet_placeholder_layout)
-        recycler = findViewById(R.id.search_recycler)
-        currentHistory = historyInteractor.getHistory() ?: arrayListOf()
+        searchPlaceholderLayout = binding.searchPlaceholderLayout
+        noInternetPlaceholderLayout = binding.noInternetPlaceholderLayout
+        recycler = binding.searchRecycler
+
+        viewModel.updateCurrentHistory()
         adapter = SearchTrackAdapter(emptyList()) {
             if (clickDebounce()) {
-                currentHistory.add(it)
-                historyInteractor.putHistory(currentHistory)
+                viewModel.addToHistory(it)
+                viewModel.addHistory()
                 val intent = Intent(this, AudioPlayerActivity::class.java)
                 intent.putExtra("Track", it)
                 startActivity(intent)
             }
         }
         recycler.adapter = adapter
-        findViewById<Button>(R.id.clear_history_btn).setOnClickListener {
-            historyInteractor.putHistory(arrayListOf())
-            currentHistory = arrayListOf()
+        binding.clearHistoryBtn.setOnClickListener {
+            viewModel.addHistory(arrayListOf())
+            viewModel.updateCurrentHistory()
             hideHistory()
         }
 
@@ -173,7 +207,7 @@ class SearchActivity : AppCompatActivity() {
     private fun setRecyclerHeight(isHistory: Boolean) {
         if (isHistory) {
             var heightInDp = 180
-            val currentHistorySize = currentHistory.size
+            val currentHistorySize = tracksSize
             if (currentHistorySize > 0 && currentHistorySize < 3) {
                 heightInDp = 60 * currentHistorySize
             }
@@ -188,48 +222,21 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showHistory() {
-        val history = historyInteractor.getHistory()
-        if (history != null && history.isNotEmpty()) {
-            adapter.updateData(history)
-            historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
-            setRecyclerHeight(true)
-            findViewById<TextView>(R.id.you_searched_for_text).isVisible = true
-            findViewById<Button>(R.id.clear_history_btn).isVisible = true
-        } else {
-            adapter.updateData(emptyList())
-        }
+        viewModel.showHistory()
+        historyPrefs.registerOnSharedPreferenceChangeListener(prefsChangeListener)
+        viewModel.updateHistoryEnablement(true)
     }
 
     private fun hideHistory() {
         historyPrefs.unregisterOnSharedPreferenceChangeListener(prefsChangeListener)
-        adapter.updateData(emptyList())
-        findViewById<TextView>(R.id.you_searched_for_text).isVisible = false
-        findViewById<Button>(R.id.clear_history_btn).isVisible = false
-        setRecyclerHeight(false)
+
+        viewModel.updateDisplayedTracks(arrayListOf())
+        viewModel.updateHistoryEnablement(false)
     }
 
     private fun loadTracks() {
         searchProgressBar.isVisible = true
-
-        SearchHelper.getTracks(
-            lastSearchQuery,
-        ) { foundTracks ->
-            searchProgressBar.isVisible = false
-
-            if (foundTracks == null) {
-                searchProgressBar.isVisible = false
-                setNoInternetPlaceholder(true)
-                adapter.updateData(emptyList())
-                return@getTracks
-            }
-
-            if (foundTracks.isNotEmpty()) {
-                adapter.updateData(foundTracks)
-            } else {
-                setSearchPlaceholder(true)
-                adapter.updateData(emptyList())
-            }
-        }
+        viewModel.loadTracks(lastSearchQuery)
     }
 
     private fun setSearchPlaceholder(isVisible: Boolean) {
@@ -251,7 +258,7 @@ class SearchActivity : AppCompatActivity() {
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
 
-        findViewById<EditText>(R.id.search_et)
+        binding.searchEt
             .setText(savedInstanceState.getString(TEXT_KEY, DEFAULT_TEXT))
     }
 

@@ -1,7 +1,7 @@
-package com.practicum.playlistmaker.domain.impl
+package com.practicum.playlistmaker.domain.search.impl
 
-import com.practicum.playlistmaker.domain.api.TracksInteractor
-import com.practicum.playlistmaker.domain.api.TracksRepository
+import com.practicum.playlistmaker.domain.search.TracksInteractor
+import com.practicum.playlistmaker.domain.search.TracksRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
