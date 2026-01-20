@@ -3,10 +3,6 @@ package com.practicum.playlistmaker.ui.search.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.search.TracksInteractor
 import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
@@ -16,6 +12,7 @@ import kotlin.collections.isNotEmpty
 
 class SearchViewModel(
     private val historyInteractor: SearchHistoryInteractor,
+    private val tracksInteractor: TracksInteractor,
 ) : ViewModel() {
 
     private var history = ArrayList<Track>()
@@ -41,7 +38,6 @@ class SearchViewModel(
     )
 
     fun getTracks(query: String, callback: (List<Track>?) -> Unit) {
-        val tracksInteractor = Creator.provideTracksInteractor()
         tracksInteractor.searchForTracks(
             expression = query,
             object : TracksInteractor.TrackConsumer {
@@ -141,14 +137,5 @@ class SearchViewModel(
             noInternet
         )
         postSearchState()
-    }
-
-    companion object {
-        fun getFactory(historyInteractor: SearchHistoryInteractor):
-                ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                SearchViewModel(historyInteractor)
-            }
-        }
     }
 }

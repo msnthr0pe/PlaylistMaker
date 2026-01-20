@@ -17,14 +17,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.creator.Creator
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_KEY
 import com.practicum.playlistmaker.data.search.history.impl.HISTORY_PREFS_NAME
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.ui.search.viewmodel.SearchViewModel
 import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchActivity : AppCompatActivity() {
 
@@ -37,13 +36,11 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var noInternetPlaceholderLayout: LinearLayout
     private lateinit var searchProgressBar: ProgressBar
     private val historyPrefs by lazy { getSharedPreferences(HISTORY_PREFS_NAME, MODE_PRIVATE) }
-    private val historyInteractor by lazy { Creator.provideSearchHistoryInteractor(this) }
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { performSearch() }
     private var isClickAllowed = true
     private var tracksSize = 0
-    private lateinit var viewModel: SearchViewModel
-
+    private val viewModel: SearchViewModel by viewModel()
 
     private val prefsChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener{ prefs, key ->
@@ -87,8 +84,6 @@ class SearchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val factory = SearchViewModel.getFactory(historyInteractor)
-        viewModel = ViewModelProvider(this, factory)[SearchViewModel::class.java]
         setViewModelObservers()
 
         binding = ActivitySearchBinding.inflate(layoutInflater)

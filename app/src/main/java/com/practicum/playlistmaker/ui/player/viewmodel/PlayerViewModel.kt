@@ -5,13 +5,10 @@ import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class PlayerViewModel(private val songUrl: String) : ViewModel() {
+class PlayerViewModel() : ViewModel() {
 
     private enum class InternalPlayerState {
         DEFAULT,
@@ -38,8 +35,8 @@ class PlayerViewModel(private val songUrl: String) : ViewModel() {
     private var mediaPlayer = MediaPlayer()
     private var mainThreadHandler: Handler? = null
 
-
     fun preparePlayer(
+        songUrl: String,
         handler: Handler?,
         onPreparedAction: () -> Unit,
         onCompletedAction: () -> Unit,
@@ -109,13 +106,6 @@ class PlayerViewModel(private val songUrl: String) : ViewModel() {
     }
 
     companion object {
-
         private const val PLAYBACK_PROGRESS_REFRESH_DELAY = 300L
-
-        fun getFactory(songUrl: String): ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                PlayerViewModel(songUrl)
-            }
-        }
     }
 }

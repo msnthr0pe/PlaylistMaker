@@ -8,12 +8,10 @@ import org.koin.dsl.module
 val viewModelModule = module {
 
     viewModel {
-        SearchViewModel(get())
+        SearchViewModel(get(), get())
     }
 
-    viewModel { parameters ->
-        PlayerViewModel(
-            songUrl = parameters.get<String>()
-        )
+    viewModel {
+        PlayerViewModel()
     }
 }
