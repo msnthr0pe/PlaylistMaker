@@ -8,6 +8,7 @@ import com.practicum.playlistmaker.data.search.network.NetworkClient
 import com.practicum.playlistmaker.data.search.network.RetrofitNetworkClient
 import com.practicum.playlistmaker.data.search.network.SearchMusicApi
 import com.practicum.playlistmaker.data.search.network.StorageClient
+import com.practicum.playlistmaker.data.theme.ThemeEditorClient
 import com.practicum.playlistmaker.domain.models.Track
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -46,6 +47,10 @@ val dataModule = module {
 
     single<NetworkClient> {
         RetrofitNetworkClient
+    }
+
+    single<ThemeEditorClient> {
+        ThemeEditorClient(get())
     }
 
 }
