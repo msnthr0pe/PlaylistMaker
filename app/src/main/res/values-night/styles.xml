@@ -28,6 +28,11 @@
         <item name="android:textSize">@dimen/title_size</item>
     </style>
 
+    <style name="TabTextView" parent="BaseTextView">
+        <item name="fontFamily">@font/ys_display_medium</item>
+        <item name="android:textSize">@dimen/regular_size</item>
+    </style>
+
     <style name="SettingsScreenStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="genericScreenBackground">@color/yp_black</item>
         <item name="genericTextColor">@color/white</item>
