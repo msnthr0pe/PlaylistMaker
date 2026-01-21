@@ -9,17 +9,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.lifecycle.ViewModelProvider
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.player.viewmodel.PlayerViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioPlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAudioPlayerBinding
-    private lateinit var viewModel: PlayerViewModel
+    private val viewModel: PlayerViewModel by viewModel()
     private lateinit var playButton: ImageButton
     private lateinit var currentTrackTime: TextView
     private lateinit var track: Track
@@ -45,9 +45,6 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private fun setData() {
         track = intent.getSerializableExtra("Track") as Track
-
-        val factory = PlayerViewModel.getFactory(track.previewUrl)
-        viewModel = ViewModelProvider(this, factory)[PlayerViewModel::class.java]
 
         val pic = PlaylistUtil.getHigherResolutionPic(track.artworkUrl100)
         val imageView = binding.playerSongImage
@@ -88,6 +85,7 @@ class AudioPlayerActivity : AppCompatActivity() {
 
     private fun preparePlayer() {
         viewModel.preparePlayer(
+            track.previewUrl,
             mainThreadHandler,
             {
                 playButton.isEnabled = true
