@@ -7,10 +7,14 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.tabs.TabLayoutMediator
 import com.practicum.playlistmaker.databinding.ActivityMediaBinding
+import com.practicum.playlistmaker.ui.media.viewmodel.MediaViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.getValue
 
 class MediaActivity : AppCompatActivity() {
     private lateinit var binding : ActivityMediaBinding
     private lateinit var tabMediator: TabLayoutMediator
+    private val viewModel: MediaViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,8 +28,8 @@ class MediaActivity : AppCompatActivity() {
         }
 
         binding.backMediaBtn.setOnClickListener {
-                finish()
-            }
+            finish()
+        }
 
         binding.viewPager.adapter = MediaViewPagerAdapter(supportFragmentManager, lifecycle)
 
