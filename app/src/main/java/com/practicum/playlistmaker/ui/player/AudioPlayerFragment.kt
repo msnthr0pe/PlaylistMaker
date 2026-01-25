@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.os.bundleOf
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityAudioPlayerBinding
@@ -40,24 +40,17 @@ class AudioPlayerFragment : Fragment() {
         private const val ARGS_TRACK_COUNTRY = "track.country"
         private const val ARGS_TRACK_PREVIEW_URL = "track.previewUrl"
 
-        const val TAG = "AudioPlayerFragment"
-
-        fun newInstance(track: Track): Fragment {
-            return AudioPlayerFragment().apply {
-                arguments = bundleOf(
-                    ARGS_TRACK_TRACK_NAME to track.trackName,
-                    ARGS_TRACK_ARTIST_NAME to track.artistName,
-                    ARGS_TRACK_TRACK_TIME_MILLIS to track.trackTimeMillis,
-                    ARGS_TRACK_ARTWORK_URL_100 to track.artworkUrl100,
-                    ARGS_TRACK_COLLECTION_NAME to track.collectionName,
-                    ARGS_TRACK_RELEASE_DATE to track.releaseDate,
-                    ARGS_TRACK_PRIMARY_GENRE_NAME to track.primaryGenreName,
-                    ARGS_TRACK_COUNTRY to track.country,
-                    ARGS_TRACK_PREVIEW_URL to track.previewUrl,
-                )
-            }
+        fun createArgs(track: Track) = Bundle().apply {
+            putString(ARGS_TRACK_TRACK_NAME, track.trackName)
+            putString(ARGS_TRACK_ARTIST_NAME, track.artistName)
+            putLong(ARGS_TRACK_TRACK_TIME_MILLIS, track.trackTimeMillis)
+            putString(ARGS_TRACK_ARTWORK_URL_100, track.artworkUrl100)
+            putString(ARGS_TRACK_COLLECTION_NAME, track.collectionName)
+            putString(ARGS_TRACK_RELEASE_DATE, track.releaseDate)
+            putString(ARGS_TRACK_PRIMARY_GENRE_NAME, track.primaryGenreName)
+            putString(ARGS_TRACK_COUNTRY, track.country)
+            putString(ARGS_TRACK_PREVIEW_URL, track.previewUrl)
         }
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -82,18 +75,18 @@ class AudioPlayerFragment : Fragment() {
 
     private fun getTrack(): Track {
         return Track(
-            requireArguments().getString(ARGS_TRACK_TRACK_NAME) ?: "",
-            requireArguments().getString(ARGS_TRACK_ARTIST_NAME) ?: "",
-            requireArguments().getLong(ARGS_TRACK_TRACK_TIME_MILLIS),
-            requireArguments().getString(ARGS_TRACK_ARTWORK_URL_100) ?: "",
+            arguments?.getString(ARGS_TRACK_TRACK_NAME) ?: "",
+            arguments?.getString(ARGS_TRACK_ARTIST_NAME) ?: "",
+            arguments?.getLong(ARGS_TRACK_TRACK_TIME_MILLIS) ?: 0,
+            arguments?.getString(ARGS_TRACK_ARTWORK_URL_100) ?: "",
 
-            requireArguments().getString(ARGS_TRACK_COLLECTION_NAME) ?: "",
+            arguments?.getString(ARGS_TRACK_COLLECTION_NAME) ?: "",
 
-            requireArguments().getString(ARGS_TRACK_RELEASE_DATE) ?: "",
+            arguments?.getString(ARGS_TRACK_RELEASE_DATE) ?: "",
 
-            requireArguments().getString(ARGS_TRACK_PRIMARY_GENRE_NAME) ?: "",
-            requireArguments().getString(ARGS_TRACK_COUNTRY) ?: "",
-            requireArguments().getString(ARGS_TRACK_PREVIEW_URL) ?: "",
+            arguments?.getString(ARGS_TRACK_PRIMARY_GENRE_NAME) ?: "",
+            arguments?.getString(ARGS_TRACK_COUNTRY) ?: "",
+            arguments?.getString(ARGS_TRACK_PREVIEW_URL) ?: "",
         )
     }
 
@@ -152,11 +145,10 @@ class AudioPlayerFragment : Fragment() {
     private fun setOnClickListeners() {
         binding.apply {
             backPlayerBtn.setOnClickListener {
-                //finish()
+                findNavController().navigateUp()
             }
         }
         playButton = binding.playButton
-        //playButton.isEnabled = false
         playButton.setOnClickListener {
             viewModel.playbackControl()
         }

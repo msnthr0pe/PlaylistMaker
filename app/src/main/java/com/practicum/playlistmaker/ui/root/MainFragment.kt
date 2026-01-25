@@ -7,12 +7,9 @@ import android.view.ViewGroup
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
+import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivityMainBinding
-import com.practicum.playlistmaker.ui.media.MediaFragment
-import com.practicum.playlistmaker.ui.search.SearchFragment
-import com.practicum.playlistmaker.ui.settings.SettingsFragment
 
 class MainFragment : Fragment() {
     private lateinit var binding: ActivityMainBinding
@@ -33,22 +30,15 @@ class MainFragment : Fragment() {
 
         binding.apply {
             searchBtn.setOnClickListener {
-                parentFragmentManager.commit {
-                    replace(R.id.rootFragmentContainerView, SearchFragment())
-                    addToBackStack(SearchFragment.TAG)
-                }
+                findNavController().navigate(R.id.action_mainFragment_to_searchFragment)
             }
             mediaBtn.setOnClickListener {
-                parentFragmentManager.commit {
-                    replace(R.id.rootFragmentContainerView, MediaFragment())
-                    addToBackStack(MediaFragment.TAG)
-                }
+                findNavController().navigate(R.id.action_mainFragment_to_mediaFragment)
+
             }
             settingsBtn.setOnClickListener {
-                parentFragmentManager.commit {
-                    replace(R.id.rootFragmentContainerView, SettingsFragment())
-                    addToBackStack(SettingsFragment.TAG)
-                }
+                findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
+
             }
         }
     }

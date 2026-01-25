@@ -16,7 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.commit
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
@@ -174,16 +174,9 @@ class SearchFragment : Fragment() {
                 viewModel.addToHistory(it)
                 viewModel.addHistory()
 
-                parentFragmentManager.commit {
-                    replace(
-                        R.id.rootFragmentContainerView,
-                        AudioPlayerFragment.newInstance(
-                            track = it
-                        ),
-                        AudioPlayerFragment.TAG
-                    )
-                    addToBackStack(AudioPlayerFragment.TAG)
-                }
+                findNavController().navigate(R.id.action_searchFragment_to_audioPlayerFragment,
+                    AudioPlayerFragment.createArgs(it))
+
             }
         }
         recycler.adapter = adapter
@@ -255,7 +248,6 @@ class SearchFragment : Fragment() {
     }
 
     companion object {
-        const val TAG = "SearchFragment"
         private const val TEXT_KEY = "TEXT"
         private const val DEFAULT_TEXT = ""
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
