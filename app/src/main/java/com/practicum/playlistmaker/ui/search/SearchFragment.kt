@@ -19,14 +19,15 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivitySearchBinding
+import com.practicum.playlistmaker.databinding.FragmentSearchBinding
 import com.practicum.playlistmaker.ui.search.viewmodel.SearchViewModel
 import com.practicum.playlistmaker.ui.player.AudioPlayerFragment
+import com.practicum.playlistmaker.ui.root.RootActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : Fragment() {
 
-    private lateinit var binding: ActivitySearchBinding
+    private lateinit var binding: FragmentSearchBinding
     private var searchText = ""
     private var lastSearchQuery = ""
     private lateinit var adapter: SearchTrackAdapter
@@ -38,6 +39,7 @@ class SearchFragment : Fragment() {
     private val searchRunnable = Runnable { performSearch() }
     private var isClickAllowed = true
     private var tracksSize = 0
+    private val rootActivity by lazy { requireActivity() as RootActivity }
     private val viewModel: SearchViewModel by viewModel()
 
     private fun setViewModelObservers() {
@@ -71,7 +73,7 @@ class SearchFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = ActivitySearchBinding.inflate(inflater, container, false)
+        binding = FragmentSearchBinding.inflate(inflater, container, false)
         return (binding.root)
     }
 
@@ -79,12 +81,6 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setViewModelObservers()
-
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
         setupRecycler()
 
@@ -136,6 +132,17 @@ class SearchFragment : Fragment() {
             false
         }
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val isKeyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+
+            if (isKeyboardVisible) {
+                rootActivity.setBottomBarVisibility(false)
+            } else {
+                rootActivity.setBottomBarVisibility(true)
+            }
+            insets
+        }
+
         binding.retrySearchButton.setOnClickListener {
             viewModel.updatePlaceholdersState(search = false, noInternet = false)
             loadTracks()
@@ -173,6 +180,8 @@ class SearchFragment : Fragment() {
             if (clickDebounce()) {
                 viewModel.addToHistory(it)
                 viewModel.addHistory()
+
+                rootActivity.setBottomBarVisibility(false)
 
                 findNavController().navigate(R.id.action_searchFragment_to_audioPlayerFragment,
                     AudioPlayerFragment.createArgs(it))

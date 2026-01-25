@@ -6,33 +6,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.net.toUri
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.practicum.playlistmaker.PlaylistMakerApp
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivitySettingsBinding
+import com.practicum.playlistmaker.databinding.FragmentSettingsBinding
 import com.practicum.playlistmaker.ui.settings.viewmodel.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SettingsFragment : Fragment() {
-    private lateinit var binding: ActivitySettingsBinding
+    private lateinit var binding: FragmentSettingsBinding
     private val viewModel: SettingsViewModel by viewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
+        binding = FragmentSettingsBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-
         val isDarkThemeEnabled = (requireActivity().applicationContext as PlaylistMakerApp).isDarkThemeEnabled()
 
         val darkThemeSwitch = binding.darkThemeSwitch
@@ -45,10 +37,6 @@ class SettingsFragment : Fragment() {
             (requireActivity().applicationContext as PlaylistMakerApp).setDarkTheme(isNightTheme)
         }
         binding.apply {
-            backSettingsBtn.setOnClickListener {
-                //finish()
-            }
-
             shareAppBtn.setOnClickListener {
                 val intent = Intent(Intent.ACTION_SEND)
                 intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.course_link))
@@ -69,9 +57,5 @@ class SettingsFragment : Fragment() {
                 startActivity(Intent(Intent.ACTION_VIEW, getString(R.string.legal_link).toUri()))
             }
         }
-    }
-
-    companion object {
-        const val TAG = "SettingsFragment"
     }
 }

@@ -3,28 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/mainFragment">
+    app:startDestination="@id/mediaFragment">
 
-    <fragment
-        android:id="@+id/mainFragment"
-        android:name="com.practicum.playlistmaker.ui.root.MainFragment"
-        android:label="activity_main"
-        tools:layout="@layout/activity_main" >
-        <action
-            android:id="@+id/action_mainFragment_to_mediaFragment"
-            app:destination="@id/mediaFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_searchFragment"
-            app:destination="@id/searchFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
-    </fragment>
     <fragment
         android:id="@+id/searchFragment"
         android:name="com.practicum.playlistmaker.ui.search.SearchFragment"
         android:label="activity_search"
-        tools:layout="@layout/activity_search" >
+        tools:layout="@layout/fragment_search" >
         <action
             android:id="@+id/action_searchFragment_to_audioPlayerFragment"
             app:destination="@id/audioPlayerFragment" />
@@ -33,7 +18,7 @@
         android:id="@+id/mediaFragment"
         android:name="com.practicum.playlistmaker.ui.media.MediaFragment"
         android:label="activity_media"
-        tools:layout="@layout/activity_media" >
+        tools:layout="@layout/fragment_media" >
         <action
             android:id="@+id/action_mediaFragment_to_favouritesFragment"
             app:destination="@id/favouritesFragment" />
@@ -45,7 +30,7 @@
         android:id="@+id/settingsFragment"
         android:name="com.practicum.playlistmaker.ui.settings.SettingsFragment"
         android:label="activity_settings"
-        tools:layout="@layout/activity_settings" />
+        tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/favouritesFragment"
         android:name="com.practicum.playlistmaker.ui.media.fragments.FavouritesFragment"
@@ -60,5 +45,5 @@
         android:id="@+id/audioPlayerFragment"
         android:name="com.practicum.playlistmaker.ui.player.AudioPlayerFragment"
         android:label="activity_audio_player"
-        tools:layout="@layout/activity_audio_player" />
+        tools:layout="@layout/fragment_audio_player" />
 </navigation>

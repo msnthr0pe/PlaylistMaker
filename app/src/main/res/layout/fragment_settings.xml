@@ -10,34 +10,13 @@
     android:theme="@style/SettingsScreenStyle"
     tools:context=".ui.settings.SettingsFragment">
 
-    <FrameLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:textAppearance="@style/TitleTextView"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/default_padding">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <ImageView
-                android:id="@+id/back_settings_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="@dimen/title_margin"
-                android:src="@drawable/ic_back"
-                app:tint="?attr/genericTextColor" />
-
-            <TextView
-                android:textAppearance="@style/TitleTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/settings"
-                android:textSize="@dimen/title_size"
-                android:layout_marginTop="@dimen/top_margin"
-                android:layout_marginStart="@dimen/title_margin" />
-        </LinearLayout>
-
-    </FrameLayout>
+        android:text="@string/settings"
+        android:textSize="@dimen/title_size"
+        android:layout_margin="@dimen/medium_margin"/>
 
     <LinearLayout
         android:layout_width="match_parent"

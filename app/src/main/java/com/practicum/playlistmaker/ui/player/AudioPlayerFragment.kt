@@ -8,20 +8,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ActivityAudioPlayerBinding
+import com.practicum.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.ui.player.viewmodel.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioPlayerFragment : Fragment() {
 
-    private lateinit var binding: ActivityAudioPlayerBinding
+    private lateinit var binding: FragmentAudioPlayerBinding
     private val viewModel: PlayerViewModel by viewModel()
     private lateinit var playButton: ImageButton
     private lateinit var currentTrackTime: TextView
@@ -55,17 +53,13 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = ActivityAudioPlayerBinding.inflate(layoutInflater)
+        binding = FragmentAudioPlayerBinding.inflate(layoutInflater)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
+
         mainThreadHandler = Handler(Looper.getMainLooper())
         setData()
         setViewModelObservers()
