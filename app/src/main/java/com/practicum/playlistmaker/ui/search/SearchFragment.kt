@@ -1,28 +1,30 @@
 package com.practicum.playlistmaker.ui.search
 
-import android.content.Intent
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.commit
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ActivitySearchBinding
 import com.practicum.playlistmaker.ui.search.viewmodel.SearchViewModel
-import com.practicum.playlistmaker.ui.player.AudioPlayerActivity
+import com.practicum.playlistmaker.ui.player.AudioPlayerFragment
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : Fragment() {
 
     private lateinit var binding: ActivitySearchBinding
     private var searchText = ""
@@ -40,7 +42,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun setViewModelObservers() {
         with (viewModel) {
-            observeSearchState.observe(this@SearchActivity) {
+            observeSearchState.observe(viewLifecycleOwner) {
                 adapter.updateData(it.displayedTracks.reversed())
                 tracksSize = it.displayedTracks.size
 
@@ -67,14 +69,17 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        super.onCreateView(inflater, container, savedInstanceState)
+        binding = ActivitySearchBinding.inflate(inflater, container, false)
+        return (binding.root)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setViewModelObservers()
 
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -92,18 +97,14 @@ class SearchActivity : AppCompatActivity() {
             searchField.setText("")
             searchText = ""
 
-            val view = this.currentFocus
+            val view = requireActivity().currentFocus
             if (view != null) {
-                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = requireContext().getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(view.windowToken, 0)
             }
         }
 
         clearBtn.visibility = View.GONE
-
-        binding.backSearchBtn.setOnClickListener {
-            finish()
-        }
 
         searchField.doOnTextChanged { _, _, _, _ ->
             if (searchField.text.isNotEmpty()) {
@@ -172,9 +173,17 @@ class SearchActivity : AppCompatActivity() {
             if (clickDebounce()) {
                 viewModel.addToHistory(it)
                 viewModel.addHistory()
-                val intent = Intent(this, AudioPlayerActivity::class.java)
-                intent.putExtra("Track", it)
-                startActivity(intent)
+
+                parentFragmentManager.commit {
+                    replace(
+                        R.id.rootFragmentContainerView,
+                        AudioPlayerFragment.newInstance(
+                            track = it
+                        ),
+                        AudioPlayerFragment.TAG
+                    )
+                    addToBackStack(AudioPlayerFragment.TAG)
+                }
             }
         }
         recycler.adapter = adapter
@@ -183,7 +192,6 @@ class SearchActivity : AppCompatActivity() {
             viewModel.updateCurrentHistory()
             hideHistory()
         }
-
     }
 
     private fun setRecyclerHeight(isHistory: Boolean) {
@@ -240,14 +248,14 @@ class SearchActivity : AppCompatActivity() {
         outState.putString(TEXT_KEY, searchText)
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
         binding.searchEt
-            .setText(savedInstanceState.getString(TEXT_KEY, DEFAULT_TEXT))
+            .setText(savedInstanceState?.getString(TEXT_KEY, DEFAULT_TEXT))
     }
 
     companion object {
+        const val TAG = "SearchFragment"
         private const val TEXT_KEY = "TEXT"
         private const val DEFAULT_TEXT = ""
         private const val SEARCH_DEBOUNCE_DELAY = 2000L

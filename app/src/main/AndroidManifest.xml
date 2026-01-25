@@ -14,10 +14,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlaylistMaker">
         <activity
-            android:name=".ui.player.AudioPlayerActivity"
+            android:name=".ui.player.AudioPlayerFragment"
             android:exported="false" />
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.root.RootActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -26,13 +26,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.media.MediaActivity"
+            android:name=".ui.media.MediaFragment"
             android:exported="false" />
         <activity
-            android:name=".ui.search.SearchActivity"
+            android:name=".ui.search.SearchFragment"
             android:exported="false" />
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name=".ui.settings.SettingsFragment"
             android:exported="false" />
     </application>
 

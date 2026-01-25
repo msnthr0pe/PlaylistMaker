@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="?attr/genericScreenBackground"
     android:orientation="vertical"
-    tools:context=".ui.search.SearchActivity">
+    tools:context=".ui.search.SearchFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
