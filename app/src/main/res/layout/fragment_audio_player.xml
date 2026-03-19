@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/genericScreenBackground"
-    tools:context=".ui.player.AudioPlayerActivity">
+    tools:context=".ui.player.AudioPlayerFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
