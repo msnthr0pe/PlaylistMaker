@@ -103,7 +103,10 @@ class SearchFragment : Fragment() {
 
         clearBtn.visibility = View.GONE
 
-        searchField.doOnTextChanged { _, _, _, _ ->
+        searchField.doOnTextChanged { text, _, _, _ ->
+            val query = text?.toString().orEmpty()
+            if (query == searchText) return@doOnTextChanged
+
             if (searchField.text.isNotEmpty()) {
                 clearBtn.isVisible = true
                 hideHistory()
@@ -262,12 +265,11 @@ class SearchFragment : Fragment() {
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
         binding.searchEt
-            .setText(savedInstanceState?.getString(TEXT_KEY, DEFAULT_TEXT))
+            .setText(savedInstanceState?.getString(TEXT_KEY, searchText) ?: searchText)
     }
 
     companion object {
         private const val TEXT_KEY = "TEXT"
-        private const val DEFAULT_TEXT = ""
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
