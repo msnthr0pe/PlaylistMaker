@@ -13,7 +13,7 @@ class SearchHistoryInteractorImpl(
     }
 
     override fun saveToHistory(tracks: ArrayList<Track>) {
-        if (tracks.isNotEmpty() && tracks.count{it == tracks.last()} > 1) {
+        if (tracks.isNotEmpty() && tracks.count{it.trackId == tracks.last().trackId} > 1) {
             val lastElement = tracks.last()
             tracks.remove(lastElement)
         }

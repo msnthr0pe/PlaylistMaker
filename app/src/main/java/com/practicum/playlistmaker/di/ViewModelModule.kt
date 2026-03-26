@@ -16,7 +16,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PlayerViewModel()
+        PlayerViewModel(get())
     }
 
     viewModel {

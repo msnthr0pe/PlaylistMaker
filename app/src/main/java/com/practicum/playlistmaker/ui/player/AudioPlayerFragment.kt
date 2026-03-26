@@ -61,6 +61,7 @@ class AudioPlayerFragment : Fragment() {
 
         setData()
         setViewModelObservers()
+        viewModel.setupFavouriteButtonState(track)
         preparePlayer()
         setOnClickListeners()
     }
@@ -120,7 +121,21 @@ class AudioPlayerFragment : Fragment() {
             observeProgressTime().observe(viewLifecycleOwner) {
                 currentTrackTime.text = it
             }
+
+            observeFavouriteButtonState().observe(viewLifecycleOwner) {
+                track.isFavourite = it
+                updateFavouriteButtonState()
+            }
         }
+    }
+
+    private fun updateFavouriteButtonState() {
+        val imageResource = if (track.isFavourite) {
+            R.drawable.ic_favorites_filled
+        } else {
+            R.drawable.ic_favorites
+        }
+        binding.favoritesButton.setImageResource(imageResource)
     }
 
     private fun preparePlayer() {
@@ -143,6 +158,11 @@ class AudioPlayerFragment : Fragment() {
         playButton = binding.playButton
         playButton.setOnClickListener {
             viewModel.playbackControl()
+        }
+        binding.favoritesButton.setOnClickListener {
+            track.isFavourite = !track.isFavourite
+            updateFavouriteButtonState()
+            viewModel.onFavouritesButtonClicked(track)
         }
     }
 

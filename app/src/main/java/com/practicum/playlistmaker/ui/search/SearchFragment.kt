@@ -105,10 +105,9 @@ class SearchFragment : Fragment() {
 
         searchField.doOnTextChanged { text, _, _, _ ->
             val query = text?.toString().orEmpty()
-            if (query == searchText) return@doOnTextChanged
-
             if (searchField.text.isNotEmpty()) {
                 clearBtn.isVisible = true
+                if (query == searchText) return@doOnTextChanged
                 hideHistory()
             } else {
                 showHistory()
