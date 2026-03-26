@@ -14,6 +14,7 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
         if (response.resultCode == 200) {
             val tracks = (response as TrackSearchResponse).results.map {
                 Track(
+                    trackId = it.trackId,
                     trackName = it.trackName,
                     artistName = it.artistName,
                     trackTimeMillis = it.trackTimeMillis,

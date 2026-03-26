@@ -25,6 +25,7 @@ class AudioPlayerFragment : Fragment() {
 
     companion object {
 
+        private const val ARGS_TRACK_TRACK_ID = "track.trackId"
         private const val ARGS_TRACK_TRACK_NAME = "track.trackName"
         private const val ARGS_TRACK_ARTIST_NAME = "track.artistName"
         private const val ARGS_TRACK_TRACK_TIME_MILLIS = "track.trackTimeMillis"
@@ -36,6 +37,7 @@ class AudioPlayerFragment : Fragment() {
         private const val ARGS_TRACK_PREVIEW_URL = "track.previewUrl"
 
         fun createArgs(track: Track) = Bundle().apply {
+            putLong(ARGS_TRACK_TRACK_ID, track.trackId)
             putString(ARGS_TRACK_TRACK_NAME, track.trackName)
             putString(ARGS_TRACK_ARTIST_NAME, track.artistName)
             putLong(ARGS_TRACK_TRACK_TIME_MILLIS, track.trackTimeMillis)
@@ -65,6 +67,7 @@ class AudioPlayerFragment : Fragment() {
 
     private fun getTrack(): Track {
         return Track(
+            arguments?.getLong(ARGS_TRACK_TRACK_ID) ?: 0,
             arguments?.getString(ARGS_TRACK_TRACK_NAME) ?: "",
             arguments?.getString(ARGS_TRACK_ARTIST_NAME) ?: "",
             arguments?.getLong(ARGS_TRACK_TRACK_TIME_MILLIS) ?: 0,
