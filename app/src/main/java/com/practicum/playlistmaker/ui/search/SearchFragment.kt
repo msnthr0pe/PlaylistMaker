@@ -32,7 +32,7 @@ class SearchFragment : Fragment() {
     private lateinit var binding: FragmentSearchBinding
     private var searchText = ""
     private var lastSearchQuery = ""
-    private lateinit var adapter: SearchTrackAdapter
+    private lateinit var adapter: TrackAdapter
     private lateinit var recycler: RecyclerView
     private lateinit var searchPlaceholderLayout: LinearLayout
     private lateinit var noInternetPlaceholderLayout: LinearLayout
@@ -111,18 +111,10 @@ class SearchFragment : Fragment() {
                 hideHistory()
             } else {
                 showHistory()
-                viewModel.updatePlaceholdersState(search = false, noInternet = false)
                 clearBtn.isVisible = false
             }
             searchText = searchField.text.toString()
             searchDebounce()
-        }
-
-        searchField.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                showHistory()
-                viewModel.updatePlaceholdersState(search = false, noInternet = false)
-            }
         }
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
@@ -187,7 +179,7 @@ class SearchFragment : Fragment() {
         recycler = binding.searchRecycler
 
         viewModel.updateCurrentHistory()
-        adapter = SearchTrackAdapter(emptyList()) {
+        adapter = TrackAdapter(emptyList()) {
             if (clickDebounce()) {
                 viewModel.addToHistory(it)
                 viewModel.addHistory()
@@ -230,6 +222,7 @@ class SearchFragment : Fragment() {
             registerPrefsChangeListener()
             updateHistoryEnablement(true)
         }
+        viewModel.updatePlaceholdersState(search = false, noInternet = false)
     }
 
     private fun hideHistory() {

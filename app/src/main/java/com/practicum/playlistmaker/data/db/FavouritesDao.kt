@@ -15,9 +15,9 @@ interface FavouritesDao {
     @Delete
     suspend fun removeFavourite(favourite: FavouritesEntity)
 
-    @Query("SELECT * FROM favourites")
+    @Query("SELECT * FROM favourites ORDER BY createdAt DESC")
     suspend fun getFavourites(): List<FavouritesEntity>
 
-    @Query("SELECT trackId FROM favourites")
-    suspend fun getFavouriteIds(): List<Long>
+    @Query("SELECT trackId FROM favourites ORDER BY createdAt DESC")
+    suspend fun getFavoriteIds(): List<Long>
 }
