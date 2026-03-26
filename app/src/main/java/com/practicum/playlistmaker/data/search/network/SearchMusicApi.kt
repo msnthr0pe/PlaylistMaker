@@ -1,15 +1,14 @@
 package com.practicum.playlistmaker.data.search.network
 
 import com.practicum.playlistmaker.data.search.dto.TrackSearchResponse
-import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface SearchMusicApi {
 
     @GET("search")
-    fun search(
+    suspend fun search(
         @Query("entity") entity: String = "song",
         @Query("term") text: String
-    ): Call<TrackSearchResponse>
+    ): TrackSearchResponse
 }

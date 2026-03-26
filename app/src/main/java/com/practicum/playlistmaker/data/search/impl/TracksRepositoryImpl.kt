@@ -5,26 +5,29 @@ import com.practicum.playlistmaker.data.search.dto.TrackSearchRequest
 import com.practicum.playlistmaker.data.search.dto.TrackSearchResponse
 import com.practicum.playlistmaker.domain.search.TracksRepository
 import com.practicum.playlistmaker.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
-    override fun searchForTracks(expression: String): List<Track>? {
+    override fun searchForTracks(expression: String): Flow<List<Track>?> = flow {
         val response = networkClient.doRequest(TrackSearchRequest(expression))
         if (response.resultCode == 200) {
-            return (response as TrackSearchResponse).results.map {
+            val tracks = (response as TrackSearchResponse).results.map {
                 Track(
                     trackName = it.trackName,
                     artistName = it.artistName,
                     trackTimeMillis = it.trackTimeMillis,
                     artworkUrl100 = it.artworkUrl100,
                     collectionName = it.collectionName,
-                    releaseDate = it.releaseDate,
+                    releaseDate = it.releaseDate ?: "unknown date",
                     primaryGenreName = it.primaryGenreName,
                     country = it.country,
-                    previewUrl = it.previewUrl,
+                    previewUrl = it.previewUrl ?: "unknown url",
                 )
             }
+            emit(tracks)
         } else {
-            return null
+            emit(null)
         }
     }
 }

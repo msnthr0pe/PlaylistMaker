@@ -2,23 +2,26 @@ package com.practicum.playlistmaker.data.search.network
 
 import com.practicum.playlistmaker.data.search.dto.Response
 import com.practicum.playlistmaker.data.search.dto.TrackSearchRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.lang.Exception
 
 class RetrofitNetworkClient(
     val searchMusicApi: SearchMusicApi
 ) : NetworkClient {
 
-    override fun doRequest(dto: Any): Response {
-        if (dto is TrackSearchRequest) {
-            try {
-                val resp = searchMusicApi.search(text = dto.text).execute()
-                val body = resp.body() ?: Response()
-                return body.apply { resultCode = resp.code() }
-            } catch (_: Exception){
-                return Response()
+    override suspend fun doRequest(dto: Any): Response {
+        return withContext(Dispatchers.IO) {
+            if (dto is TrackSearchRequest) {
+                try {
+                    val resp = searchMusicApi.search(text = dto.text)
+                    resp.apply { resultCode = 200 }
+                } catch (_: Exception) {
+                    Response()
+                }
+            } else {
+                Response().apply { resultCode = 400 }
             }
-        } else {
-            return Response().apply { resultCode = 400 }
         }
     }
 

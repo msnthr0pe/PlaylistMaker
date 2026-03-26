@@ -1,8 +1,6 @@
 package com.practicum.playlistmaker.ui.player
 
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +22,6 @@ class AudioPlayerFragment : Fragment() {
     private lateinit var playButton: ImageButton
     private lateinit var currentTrackTime: TextView
     private lateinit var track: Track
-    private var mainThreadHandler: Handler? = null
 
     companion object {
 
@@ -60,7 +57,6 @@ class AudioPlayerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        mainThreadHandler = Handler(Looper.getMainLooper())
         setData()
         setViewModelObservers()
         preparePlayer()
@@ -127,7 +123,6 @@ class AudioPlayerFragment : Fragment() {
     private fun preparePlayer() {
         viewModel.preparePlayer(
             track.previewUrl,
-            mainThreadHandler,
             {
                 playButton.isEnabled = true
             },

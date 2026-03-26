@@ -1,10 +1,14 @@
 package com.practicum.playlistmaker.ui.player.viewmodel
 
 import android.media.MediaPlayer
-import android.os.Handler
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -30,18 +34,16 @@ class PlayerViewModel() : ViewModel() {
     fun observeProgressTime(): LiveData<String> = progressTimeLiveData
 
     private var internalPlayerState: InternalPlayerState = InternalPlayerState.DEFAULT
-    private val _isPlaying = MutableLiveData<Boolean>(false)
+    private val _isPlaying = MutableLiveData(false)
     fun observePlaying(): LiveData<Boolean> = _isPlaying
     private var mediaPlayer = MediaPlayer()
-    private var mainThreadHandler: Handler? = null
+    private var playerJob: Job? = null
 
     fun preparePlayer(
         songUrl: String,
-        handler: Handler?,
         onPreparedAction: () -> Unit,
         onCompletedAction: () -> Unit,
     ) {
-        mainThreadHandler = handler
         mediaPlayer.setDataSource(songUrl)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
@@ -60,25 +62,19 @@ class PlayerViewModel() : ViewModel() {
         mediaPlayer.start()
         internalPlayerState = InternalPlayerState.PLAYING
 
-        mainThreadHandler?.postDelayed(
-            object : Runnable {
-                override fun run() {
-                    val playbackPosition = SimpleDateFormat("m:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-                    progressTimeLiveData.postValue(playbackPosition)
-                    mainThreadHandler?.postDelayed(
-                        this,
-                        PLAYBACK_PROGRESS_REFRESH_DELAY
-                    )
-                }
-            },
-            PLAYBACK_PROGRESS_REFRESH_DELAY
-        )
+        playerJob = viewModelScope.launch {
+            while (isActive) {
+                val playbackPosition = SimpleDateFormat("m:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+                progressTimeLiveData.postValue(playbackPosition)
+                delay(PLAYBACK_PROGRESS_REFRESH_DELAY)
+            }
+        }
     }
 
     private fun pausePlayer() {
         mediaPlayer.pause()
         internalPlayerState = InternalPlayerState.PAUSED
-        mainThreadHandler?.removeCallbacksAndMessages(null)
+        playerJob?.cancel()
     }
 
     fun playbackControl() {

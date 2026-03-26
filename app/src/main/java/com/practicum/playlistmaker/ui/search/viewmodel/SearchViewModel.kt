@@ -4,12 +4,14 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.di.HISTORY_PREFS_KEY
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.search.TracksInteractor
 import com.practicum.playlistmaker.domain.search.history.SearchHistoryInteractor
 import com.practicum.playlistmaker.ui.search.models.SearchState
 import com.practicum.playlistmaker.ui.search.models.PlaceholdersState
+import kotlinx.coroutines.launch
 import kotlin.collections.isNotEmpty
 import kotlin.getValue
 
@@ -58,14 +60,13 @@ class SearchViewModel(
     }
 
     fun getTracks(query: String, callback: (List<Track>?) -> Unit) {
-        tracksInteractor.searchForTracks(
-            expression = query,
-            object : TracksInteractor.TrackConsumer {
-                override fun consume(foundTracks: List<Track>?) {
-                    callback(foundTracks)
+        viewModelScope.launch {
+            tracksInteractor
+                .searchForTracks(expression = query)
+                .collect {
+                    callback(it)
                 }
-            }
-        )
+        }
     }
 
     fun updateDisplayedTracks(tracks: ArrayList<Track>? = null) {
