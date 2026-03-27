@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.db.FavouritesInteractor
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.player.models.AudioPlayerModel
+import com.practicum.playlistmaker.ui.player.models.FavouriteState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -25,31 +27,34 @@ class PlayerViewModel(
         PAUSED,
     }
 
-    enum class PlayerState {
-        DEFAULT,
-        PREPARED,
-        COMPLETED,
-    }
+    private var progressTime = DEFAULT_PROGRESS_TIME
+    private var favouriteButtonState = FavouriteState(
+        shouldUpdateFavourites = true,
+        isFavourite = false,
+    )
+    private var isPlaying = false
 
-    private val playerStateLiveData = MutableLiveData(PlayerState.DEFAULT)
-    fun observePlayerState(): LiveData<PlayerState> = playerStateLiveData
-
-    private val progressTimeLiveData = MutableLiveData("0:00")
-    fun observeProgressTime(): LiveData<String> = progressTimeLiveData
-
-    private val _favouriteButtonState = MutableLiveData(false)
-    fun observeFavouriteButtonState(): LiveData<Boolean> = _favouriteButtonState
+    private val _audioPlayerState = MutableLiveData(
+    AudioPlayerModel(
+            progressTime,
+            favouriteButtonState,
+            isPlaying,
+        )
+    )
+    fun observeAudioPlayerState(): LiveData<AudioPlayerModel> = _audioPlayerState
 
     private var internalPlayerState: InternalPlayerState = InternalPlayerState.DEFAULT
-    private val _isPlaying = MutableLiveData(false)
-    fun observePlaying(): LiveData<Boolean> = _isPlaying
     private var mediaPlayer = MediaPlayer()
     private var playerJob: Job? = null
 
     fun setupFavouriteButtonState(track: Track) {
         viewModelScope.launch {
             favouritesInteractor.getFavourites().collect {
-                _favouriteButtonState.postValue(it.contains(track))
+                favouriteButtonState = FavouriteState(
+                    shouldUpdateFavourites = true,
+                    isFavourite = it.contains(track),
+                )
+                postAudioPlayerState()
             }
         }
     }
@@ -78,7 +83,8 @@ class PlayerViewModel(
         mediaPlayer.setOnCompletionListener {
             internalPlayerState = InternalPlayerState.PREPARED
             mediaPlayer.seekTo(0)
-            _isPlaying.postValue(false)
+            isPlaying = false
+            postAudioPlayerState()
             onCompletedAction()
         }
     }
@@ -90,7 +96,8 @@ class PlayerViewModel(
         playerJob = viewModelScope.launch {
             while (isActive) {
                 val playbackPosition = SimpleDateFormat("m:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
-                progressTimeLiveData.postValue(playbackPosition)
+                progressTime = playbackPosition
+                postAudioPlayerState()
                 delay(PLAYBACK_PROGRESS_REFRESH_DELAY)
             }
         }
@@ -103,7 +110,8 @@ class PlayerViewModel(
     }
 
     fun playbackControl() {
-        _isPlaying.value?.let { _isPlaying.postValue(!it) }
+        isPlaying = !isPlaying
+        postAudioPlayerState()
 
         when(internalPlayerState) {
             InternalPlayerState.PLAYING -> {
@@ -117,16 +125,33 @@ class PlayerViewModel(
     }
 
     fun onPause() {
-        _isPlaying.postValue(false)
+        isPlaying = false
+        postAudioPlayerState()
         pausePlayer()
     }
 
     fun onDestroy() {
-        _isPlaying.postValue(false)
+        isPlaying = false
+        postAudioPlayerState()
         mediaPlayer.release()
+    }
+
+    fun postAudioPlayerState() {
+        _audioPlayerState.postValue(
+            AudioPlayerModel(
+                progressTime,
+                favouriteButtonState,
+                isPlaying,
+            )
+        )
+        favouriteButtonState = FavouriteState(
+            shouldUpdateFavourites = false,
+            isFavourite = favouriteButtonState.isFavourite,
+        )
     }
 
     companion object {
         private const val PLAYBACK_PROGRESS_REFRESH_DELAY = 300L
+        private const val DEFAULT_PROGRESS_TIME = "0:00"
     }
 }

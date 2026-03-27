@@ -106,25 +106,13 @@ class AudioPlayerFragment : Fragment() {
 
     private fun setViewModelObservers() {
         with (viewModel) {
-            observePlayerState().observe(viewLifecycleOwner) {
-                when (it) {
-                    PlayerViewModel.PlayerState.DEFAULT -> Unit
-                    PlayerViewModel.PlayerState.PREPARED -> playButton.isEnabled = true
-                    PlayerViewModel.PlayerState.COMPLETED -> setPlayButtonImage()
-                }
-            }
-
-            observePlaying().observe(viewLifecycleOwner) {
+            observeAudioPlayerState().observe(viewLifecycleOwner) {
                 setPlayButtonImage()
-            }
-
-            observeProgressTime().observe(viewLifecycleOwner) {
-                currentTrackTime.text = it
-            }
-
-            observeFavouriteButtonState().observe(viewLifecycleOwner) {
-                track.isFavourite = it
-                updateFavouriteButtonState()
+                currentTrackTime.text = it.progressTime
+                if (it.favouriteButtonState.shouldUpdateFavourites) {
+                    track.isFavourite = it.favouriteButtonState.isFavourite
+                    updateFavouriteButtonState()
+                }
             }
         }
     }
@@ -168,7 +156,7 @@ class AudioPlayerFragment : Fragment() {
 
     private fun setPlayButtonImage() {
         playButton.setImageResource(
-            if (viewModel.observePlaying().value == true){
+            if (viewModel.observeAudioPlayerState().value?.isPlaying == true){
                 R.drawable.ic_pause
             } else R.drawable.ic_play
         )
