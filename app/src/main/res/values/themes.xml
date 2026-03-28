@@ -11,6 +11,7 @@
         <item name="searchHintColor">@color/yp_gray</item>
         <item name="searchBackgroundColor">@color/yp_light_gray</item>
         <item name="playerButtonsColor">@color/yp_black</item>
+        <item name="iconColor">@color/yp_gray</item>
     </style>
 
     <style name="TextView" parent="Widget.MaterialComponents.TextView">

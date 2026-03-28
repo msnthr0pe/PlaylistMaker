@@ -18,14 +18,14 @@
         android:orientation="vertical">
 
         <Button
-            android:id="@+id/retry_search_button"
+            android:id="@+id/new_playlist_button"
             android:layout_width="142dp"
             android:layout_height="44dp"
             android:textSize="14sp"
             app:cornerRadius="54dp"
             android:textColor="?attr/genericScreenBackground"
             android:backgroundTint="?attr/genericTextColor"
-            android:text="Новый плейлист"/>
+            android:text="@string/new_playlist"/>
 
         <ImageView
             android:id="@+id/search_placeholder"

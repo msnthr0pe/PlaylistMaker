@@ -42,7 +42,9 @@ class RootActivity : AppCompatActivity() {
     private fun configureBottomBarVisibility() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.audioPlayerFragment -> {
+                R.id.audioPlayerFragment,
+                R.id.addPlaylistFragment,
+                -> {
                     bottomBar.visibility = View.GONE
                 }
                 else -> {
