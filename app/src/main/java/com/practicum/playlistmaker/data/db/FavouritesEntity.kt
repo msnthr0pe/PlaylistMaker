@@ -1,8 +1,11 @@
-package com.practicum.playlistmaker.domain.models
+package com.practicum.playlistmaker.data.db
 
-import java.io.Serializable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-data class Track (
+@Entity(tableName = "favourites")
+data class FavouritesEntity (
+    @PrimaryKey
     val trackId: Long,
     val trackName: String,
     val artistName: String,
@@ -13,5 +16,5 @@ data class Track (
     val primaryGenreName: String,
     val country: String,
     val previewUrl: String,
-    var isFavourite: Boolean = false,
-) : Serializable
+    val createdAt: Long = System.currentTimeMillis()
+)

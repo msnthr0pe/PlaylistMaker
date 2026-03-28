@@ -25,6 +25,7 @@ class AudioPlayerFragment : Fragment() {
 
     companion object {
 
+        private const val ARGS_TRACK_TRACK_ID = "track.trackId"
         private const val ARGS_TRACK_TRACK_NAME = "track.trackName"
         private const val ARGS_TRACK_ARTIST_NAME = "track.artistName"
         private const val ARGS_TRACK_TRACK_TIME_MILLIS = "track.trackTimeMillis"
@@ -36,6 +37,7 @@ class AudioPlayerFragment : Fragment() {
         private const val ARGS_TRACK_PREVIEW_URL = "track.previewUrl"
 
         fun createArgs(track: Track) = Bundle().apply {
+            putLong(ARGS_TRACK_TRACK_ID, track.trackId)
             putString(ARGS_TRACK_TRACK_NAME, track.trackName)
             putString(ARGS_TRACK_ARTIST_NAME, track.artistName)
             putLong(ARGS_TRACK_TRACK_TIME_MILLIS, track.trackTimeMillis)
@@ -59,12 +61,14 @@ class AudioPlayerFragment : Fragment() {
 
         setData()
         setViewModelObservers()
+        viewModel.setupFavouriteButtonState(track)
         preparePlayer()
         setOnClickListeners()
     }
 
     private fun getTrack(): Track {
         return Track(
+            arguments?.getLong(ARGS_TRACK_TRACK_ID) ?: 0,
             arguments?.getString(ARGS_TRACK_TRACK_NAME) ?: "",
             arguments?.getString(ARGS_TRACK_ARTIST_NAME) ?: "",
             arguments?.getLong(ARGS_TRACK_TRACK_TIME_MILLIS) ?: 0,
@@ -102,22 +106,24 @@ class AudioPlayerFragment : Fragment() {
 
     private fun setViewModelObservers() {
         with (viewModel) {
-            observePlayerState().observe(viewLifecycleOwner) {
-                when (it) {
-                    PlayerViewModel.PlayerState.DEFAULT -> Unit
-                    PlayerViewModel.PlayerState.PREPARED -> playButton.isEnabled = true
-                    PlayerViewModel.PlayerState.COMPLETED -> setPlayButtonImage()
+            observeAudioPlayerState().observe(viewLifecycleOwner) {
+                setPlayButtonImage()
+                currentTrackTime.text = it.progressTime
+                if (it.favouriteButtonState.shouldUpdateFavourites) {
+                    track.isFavourite = it.favouriteButtonState.isFavourite
+                    updateFavouriteButtonState()
                 }
             }
-
-            observePlaying().observe(viewLifecycleOwner) {
-                setPlayButtonImage()
-            }
-
-            observeProgressTime().observe(viewLifecycleOwner) {
-                currentTrackTime.text = it
-            }
         }
+    }
+
+    private fun updateFavouriteButtonState() {
+        val imageResource = if (track.isFavourite) {
+            R.drawable.ic_favorites_filled
+        } else {
+            R.drawable.ic_favorites
+        }
+        binding.favoritesButton.setImageResource(imageResource)
     }
 
     private fun preparePlayer() {
@@ -141,11 +147,16 @@ class AudioPlayerFragment : Fragment() {
         playButton.setOnClickListener {
             viewModel.playbackControl()
         }
+        binding.favoritesButton.setOnClickListener {
+            track.isFavourite = !track.isFavourite
+            updateFavouriteButtonState()
+            viewModel.onFavouritesButtonClicked(track)
+        }
     }
 
     private fun setPlayButtonImage() {
         playButton.setImageResource(
-            if (viewModel.observePlaying().value == true){
+            if (viewModel.observeAudioPlayerState().value?.isPlaying == true){
                 R.drawable.ic_pause
             } else R.drawable.ic_play
         )

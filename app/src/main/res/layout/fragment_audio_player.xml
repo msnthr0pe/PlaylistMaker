@@ -87,7 +87,7 @@
             app:layout_constraintTop_toTopOf="@+id/play_button" />
 
         <ImageButton
-            android:id="@+id/add_to_favorites_button"
+            android:id="@+id/favorites_button"
             android:layout_width="51dp"
             android:layout_height="51dp"
             android:background="@drawable/ic_small_button_bg"

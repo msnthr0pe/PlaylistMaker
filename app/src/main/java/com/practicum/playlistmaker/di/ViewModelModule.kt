@@ -16,7 +16,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PlayerViewModel()
+        PlayerViewModel(get())
     }
 
     viewModel {
@@ -28,7 +28,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        FavouritesViewModel()
+        FavouritesViewModel(get())
     }
 
     viewModel {

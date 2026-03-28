@@ -10,7 +10,7 @@ import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.databinding.ItemSearchBinding
 import com.practicum.playlistmaker.domain.models.Track
 
-class SearchTrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Unit) : RecyclerView.Adapter<SearchTrackAdapter.SearchTrackViewHolder>() {
+class TrackAdapter(var tracks: List<Track>, val onItemClick: (Track) -> Unit) : RecyclerView.Adapter<TrackAdapter.SearchTrackViewHolder>() {
 
     private lateinit var binding: ItemSearchBinding
 
