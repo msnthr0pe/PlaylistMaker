@@ -11,4 +11,6 @@ interface PlaylistInteractor {
     ): Long
 
     suspend fun getPlaylists(): List<Playlist>
+
+    suspend fun addTrackToPlaylist(trackId: Long, playlistId: Int): List<Playlist>?
 }

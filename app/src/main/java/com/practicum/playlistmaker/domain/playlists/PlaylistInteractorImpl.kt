@@ -12,4 +12,6 @@ class PlaylistInteractorImpl(
     override suspend fun getPlaylists(): List<Playlist> =
         playlistRepository.getPlaylists()
 
+    override suspend fun addTrackToPlaylist(trackId: Long, playlistId: Int): List<Playlist>? =
+        playlistRepository.addTrackToPlaylist(trackId, playlistId)
 }

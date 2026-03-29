@@ -20,4 +20,10 @@ class PlaylistsViewModel(
             _playlists.postValue(playlistInteractor.getPlaylists())
         }
     }
+
+    fun addToPlaylist(trackId: Long, playlistId: Int) {
+        viewModelScope.launch {
+            _playlists.postValue(playlistInteractor.addTrackToPlaylist(trackId, playlistId))
+        }
+    }
 }

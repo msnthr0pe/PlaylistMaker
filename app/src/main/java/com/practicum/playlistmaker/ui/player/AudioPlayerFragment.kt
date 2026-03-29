@@ -191,7 +191,9 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        adapter = MiniPlaylistsAdapter(emptyList())
+        adapter = MiniPlaylistsAdapter(emptyList()) { playlist ->
+            playListsViewModel.addToPlaylist(track.trackId, playlist.id)
+        }
 
         recyclerView = binding.miniPlaylistsRecycler
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

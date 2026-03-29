@@ -26,7 +26,7 @@ class PlaylistRepositoryImpl(
                 name = name,
                 description = description,
                 coverUri = path,
-                tracks = "",
+                trackIds = "",
                 tracksAmount = 0,
             )
         )
@@ -34,4 +34,10 @@ class PlaylistRepositoryImpl(
 
     override suspend fun getPlaylists(): List<Playlist> =
         database.playlistDao().getPlaylists().map { converter.map(it) }
+
+    override suspend fun addTrackToPlaylist(trackId: Long, playlistId: Int): List<Playlist>? {
+        val dao = database.playlistDao()
+        return dao.addTrackToPlaylistAndGetAll(trackId, playlistId)
+            ?.map { converter.map(it) }
+    }
 }
