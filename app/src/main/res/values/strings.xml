@@ -31,10 +31,18 @@
     <string name="description">Описание</string>
     <string name="create">Создать</string>
     <string name="default_num">123</string>
-    <string name="tracks">треков</string>
+    <string name="tracks">треки</string>
     <string name="new_playlist_snackbar_text">"Плейлист %1$s успешно создан"</string>
     <string name="abort_playlist_creation_question">"Завершить создание плейлиста?"</string>
     <string name="abort_playlist_creation_message">"Все несохранённые данные будут потеряны"</string>
     <string name="yes">"Да"</string>
     <string name="no">"Нет"</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+
+    <plurals name="tracks_count">
+        <item quantity="one">%d трек</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
 </resources>

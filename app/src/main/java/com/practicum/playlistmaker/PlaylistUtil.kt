@@ -43,7 +43,7 @@ object PlaylistUtil {
         container.removeAllViews()
 
         val custom = LayoutInflater.from(rootView.context)
-            .inflate(R.layout.custom_toast, container, false)
+            .inflate(R.layout.custom_snackbar, container, false)
 
         custom.findViewById<TextView>(R.id.toast_text).text = message
         container.addView(custom)

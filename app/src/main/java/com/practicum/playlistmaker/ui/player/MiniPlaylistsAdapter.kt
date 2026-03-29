@@ -1,4 +1,4 @@
-package com.practicum.playlistmaker.ui.media
+package com.practicum.playlistmaker.ui.player
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,17 +8,17 @@ import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
-import com.practicum.playlistmaker.databinding.ItemPlaylistBinding
+import com.practicum.playlistmaker.databinding.ItemMiniPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 
-class PlaylistAdapter(var playlists: List<Playlist>) : RecyclerView.Adapter<PlaylistAdapter.SearchTrackViewHolder>() {
+class MiniPlaylistsAdapter(var playlists: List<Playlist>) : RecyclerView.Adapter<MiniPlaylistsAdapter.SearchTrackViewHolder>() {
 
-    private lateinit var binding: ItemPlaylistBinding
+    private lateinit var binding: ItemMiniPlaylistBinding
 
     inner class SearchTrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val title: TextView = binding.playlistTitle
-        val trackCount: TextView = binding.playlistTrackCount
-        val image: ImageView = binding.playlistCover
+        val title: TextView = binding.playlistMiniTitle
+        val trackCount: TextView = binding.playlistMiniTrackAmount
+        val image: ImageView = binding.playlistMiniCover
 
         fun bind(playlist: Playlist) {
             title.text = playlist.name
@@ -42,7 +42,7 @@ class PlaylistAdapter(var playlists: List<Playlist>) : RecyclerView.Adapter<Play
         viewType: Int,
     ): SearchTrackViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        binding = ItemPlaylistBinding.inflate(inflater, parent, false)
+        binding = ItemMiniPlaylistBinding.inflate(inflater, parent, false)
         return  SearchTrackViewHolder(binding.root)
     }
 

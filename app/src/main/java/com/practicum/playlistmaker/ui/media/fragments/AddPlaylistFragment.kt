@@ -18,6 +18,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAddPlaylistBinding
 import com.practicum.playlistmaker.ui.media.viewmodel.AddPlaylistViewModel
 import com.practicum.playlistmaker.ui.root.RootActivity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -38,6 +39,8 @@ class AddPlaylistFragment : Fragment() {
 
         }
     private var imageUri: Uri? = null
+    private var isClickAllowed = true
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,7 +87,13 @@ class AddPlaylistFragment : Fragment() {
             }
         }
         binding.playlistCover.setOnClickListener {
-            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            if (clickDebounce()) {
+                pickMedia.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
+            }
         }
 
         rootActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
@@ -114,8 +123,24 @@ class AddPlaylistFragment : Fragment() {
                 binding.playlistDescriptionEt.text?.isNotEmpty() == true
     }
 
+    private fun clickDebounce() : Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
+        }
+        return current
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    private companion object {
+        private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 }
