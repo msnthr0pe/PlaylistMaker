@@ -1,7 +1,14 @@
 package com.practicum.playlistmaker.domain.playlists
 
 import android.net.Uri
+import com.practicum.playlistmaker.domain.models.Playlist
 
 interface PlaylistInteractor {
-    suspend fun saveImage(uri: Uri, fileName: String)
+    suspend fun createPlaylist(
+        name: String,
+        description: String,
+        coverUri: Uri?,
+    ): Long
+
+    suspend fun getPlaylists(): List<Playlist>
 }

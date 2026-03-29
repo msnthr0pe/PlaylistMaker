@@ -1,19 +1,23 @@
 package com.practicum.playlistmaker.ui.media.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.domain.playlists.PlaylistInteractor
+import kotlinx.coroutines.launch
 
-class PlaylistsViewModel(): ViewModel() {
+class PlaylistsViewModel(
+    private val playlistInteractor: PlaylistInteractor
+): ViewModel() {
 
-    fun getStubPlaylists(): List<Playlist> {
-        return List(10) { i ->
-            Playlist(
-                name = "Playlist ${i + 1}",
-                description = "Описание плейлиста ${i + 1}",
-                coverUri = "https://example.com/cover${i + 1}.jpg",
-                tracks = emptyList(),
-                tracksAmount = (10..100).random()
-            )
+    private val _playlists = MutableLiveData<List<Playlist>>(emptyList())
+    fun observePlaylistsState(): LiveData<List<Playlist>> = _playlists
+
+    fun getPlaylists() {
+        viewModelScope.launch {
+            _playlists.postValue(playlistInteractor.getPlaylists())
         }
     }
 }

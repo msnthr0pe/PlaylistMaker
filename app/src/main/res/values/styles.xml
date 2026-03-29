@@ -83,10 +83,10 @@
     <style name="AppTextInputLayout.Outlined" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/et_stroke_color</item>
 
-        <item name="boxStrokeWidth">1dp</item>
-        <item name="boxStrokeWidthFocused">1dp</item>
+        <item name="boxStrokeWidth">2dp</item>
+        <item name="boxStrokeWidthFocused">2dp</item>
 
-        <item name="hintTextColor">@color/yp_gray</item>
+        <item name="hintTextColor">@color/et_stroke_color</item>
     </style>
 
 </resources>

@@ -5,8 +5,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.databinding.ItemPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 
@@ -15,19 +15,16 @@ class PlaylistAdapter(var playlists: List<Playlist>) : RecyclerView.Adapter<Play
     private lateinit var binding: ItemPlaylistBinding
 
     inner class SearchTrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-//        val trackNameText: TextView = binding.searchSongTitle
-//        val artistNameText: TextView = binding.searchArtistName
-//        val trackTime: TextView = binding.searchSongDuration
-        val artworkUrlImage: ImageView = binding.playlistCover
+        val title: TextView = binding.playlistTitle
+        val trackCount: TextView = binding.playlistTrackCount
+        val image: ImageView = binding.playlistCover
 
         fun bind(playlist: Playlist) {
-//            trackNameText.text = track.trackName
-//            artistNameText.text = track.artistName
-//            trackTime.text = PlaylistUtil.getFormattedTime(track.trackTimeMillis)
-//            PlaylistUtil.loadPicInto(itemView.context, track.artworkUrl100, artworkUrlImage)
-//            itemView.setOnClickListener {
-//                onItemClick(track)
-//            }
+            title.text = playlist.name
+            trackCount.text = playlist.tracksAmount.toString()
+            if (playlist.coverUri.isNotEmpty()) {
+                image.setImageURI(playlist.coverUri.toUri())
+            }
         }
 
 

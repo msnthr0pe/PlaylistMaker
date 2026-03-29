@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,16 +35,44 @@ class PlaylistsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupViewModelObserver()
+        setClickListeners()
+        setupRecyclerView()
+        updatePlaylists()
+    }
+
+    private fun setupViewModelObserver() {
+        viewModel.observePlaylistsState().observe(viewLifecycleOwner) { playlists ->
+            adapter.updateData(playlists)
+            updateEmptyPlaceholderVisibility()
+        }
+    }
+
+    private fun setClickListeners() {
         binding.newPlaylistButton.setOnClickListener {
             rootActivity.setBottomBarVisibility(false)
             findNavController().navigate(R.id.action_mediaFragment_to_addPlaylistFragment)
         }
+    }
 
-        adapter = PlaylistAdapter(viewModel.getStubPlaylists())
+    private fun setupRecyclerView() {
+        adapter = PlaylistAdapter(emptyList())
 
         recyclerView = binding.playlistRecycler
         recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
         recyclerView.adapter = adapter
+        updateEmptyPlaceholderVisibility()
+    }
+
+    private fun updateEmptyPlaceholderVisibility() {
+        with(binding) {
+            playlistsPlaceholder.isVisible = adapter.playlists.isEmpty()
+            recyclerView.isVisible = !adapter.playlists.isEmpty()
+        }
+    }
+
+    private fun updatePlaylists() {
+        viewModel.getPlaylists()
     }
 
     companion object {

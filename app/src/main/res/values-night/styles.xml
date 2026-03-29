@@ -86,7 +86,7 @@
         <item name="boxStrokeWidth">1dp</item>
         <item name="boxStrokeWidthFocused">1dp</item>
 
-        <item name="hintTextColor">@color/white</item>
+        <item name="hintTextColor">@color/et_stroke_color</item>
     </style>
 
 </resources>

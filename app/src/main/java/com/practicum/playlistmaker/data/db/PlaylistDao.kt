@@ -10,7 +10,7 @@ import androidx.room.Query
 interface PlaylistDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPlaylist(playlist: PlaylistEntity)
+    suspend fun insertPlaylist(playlist: PlaylistEntity): Long
 
     @Delete
     suspend fun removePlaylist(playlist: PlaylistEntity)
