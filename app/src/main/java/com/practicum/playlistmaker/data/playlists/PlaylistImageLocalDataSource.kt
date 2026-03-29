@@ -11,7 +11,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 class PlaylistImageLocalDataSource(
-    private val context: Context
+    private val context: Context,
 ) {
 
     suspend fun savePlaylistCover(uri: Uri, playlistId: String): Result<File> = withContext(Dispatchers.IO) {

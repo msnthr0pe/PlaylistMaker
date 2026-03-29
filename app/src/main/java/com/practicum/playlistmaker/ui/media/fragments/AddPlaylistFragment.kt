@@ -7,12 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
-import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.practicum.playlistmaker.PermissionHelper
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAddPlaylistBinding
@@ -30,16 +30,16 @@ class AddPlaylistFragment : Fragment() {
     private val viewModel: AddPlaylistViewModel by viewModel()
 
     private val pickMedia =
-        registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             imageUri = uri
             if (uri != null) {
                 binding.playlistCoverImage.isVisible = false
                 binding.playlistCover.setImageURI(uri)
             }
-
         }
     private var imageUri: Uri? = null
     private var isClickAllowed = true
+    private val permissionHelper: PermissionHelper = PermissionHelper(this)
 
 
     override fun onCreateView(
@@ -62,10 +62,7 @@ class AddPlaylistFragment : Fragment() {
                 handleAbortAttempt()
             }
             playlistNameEt.doOnTextChanged { text, _, _, _ ->
-                if (text?.isNotEmpty() == true) {
-                    createPlaylistButton.isEnabled = true
-                }
-
+                createPlaylistButton.isEnabled = text?.isNotBlank() == true
             }
             createPlaylistButton.setOnClickListener {
                 lifecycleScope.launch {
@@ -88,17 +85,24 @@ class AddPlaylistFragment : Fragment() {
         }
         binding.playlistCover.setOnClickListener {
             if (clickDebounce()) {
-                pickMedia.launch(
-                    PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                    )
-                )
+                selectCoverImage()
             }
         }
 
         rootActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             handleAbortAttempt()
         }
+    }
+
+    private fun selectCoverImage() {
+        permissionHelper.checkAndRequestPermissions(
+            onGranted = {
+                pickMedia.launch("image/*")
+            },
+            onDenied = {
+                PlaylistUtil.showSnackbar(binding.root, getString(R.string.no_permission_text))
+            }
+        )
     }
 
     private fun handleAbortAttempt() {
