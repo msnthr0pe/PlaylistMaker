@@ -40,4 +40,8 @@ class PlaylistRepositoryImpl(
         return dao.addTrackToPlaylistAndGetAll(trackId, playlistId)
             ?.map { converter.map(it) }
     }
+
+    override suspend fun getTrackIdsInPlaylist(playlistId: Int): List<Long>? =
+        database.playlistDao().getTrackIdsInPlaylist(playlistId)
+
 }

@@ -35,9 +35,11 @@
     <string name="new_playlist_snackbar_text">"Плейлист %1$s успешно создан"</string>
     <string name="abort_playlist_creation_question">"Завершить создание плейлиста?"</string>
     <string name="abort_playlist_creation_message">"Все несохранённые данные будут потеряны"</string>
-    <string name="yes">"Да"</string>
-    <string name="no">"Нет"</string>
+    <string name="yes">"Завершить"</string>
+    <string name="no">"Отмена"</string>
     <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="new_track_in_playlist_snackbar_text">"Добавлено в плейлист %1$s"</string>
+    <string name="track_exists_in_playlist_snackbar_text">"Трек уже добавлен в плейлист %1$s"</string>
 
     <plurals name="tracks_count">
         <item quantity="zero">%d треков</item>

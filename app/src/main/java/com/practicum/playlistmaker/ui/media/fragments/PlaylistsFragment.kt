@@ -42,8 +42,8 @@ class PlaylistsFragment : Fragment() {
     }
 
     private fun setupViewModelObserver() {
-        viewModel.observePlaylistsState().observe(viewLifecycleOwner) { playlists ->
-            adapter.updateData(playlists)
+        viewModel.observePlaylists().observe(viewLifecycleOwner) { state ->
+            adapter.updateData(state.playlists)
             updateEmptyPlaceholderVisibility()
         }
     }

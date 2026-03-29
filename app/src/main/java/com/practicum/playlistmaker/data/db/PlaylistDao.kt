@@ -64,4 +64,19 @@ interface PlaylistDao {
 
         return getPlaylists()
     }
+
+    @Transaction
+    suspend fun getTrackIdsInPlaylist(playlistId: Int): List<Long>? {
+        val playlist = getPlaylistById(playlistId) ?: return null
+
+        val gson = Gson()
+        return if (playlist.trackIds.isNotEmpty()) {
+            gson.fromJson<List<Long>>(
+                playlist.trackIds,
+                object : TypeToken<List<Long>>() {}.type
+            ).toMutableList()
+        } else {
+            mutableListOf()
+        }
+    }
 }

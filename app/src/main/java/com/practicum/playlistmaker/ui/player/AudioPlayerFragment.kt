@@ -16,6 +16,7 @@ import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.media.models.PlayerEvent
 import com.practicum.playlistmaker.ui.media.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.ui.player.viewmodel.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -136,8 +137,29 @@ class AudioPlayerFragment : Fragment() {
             }
         }
         with(playListsViewModel) {
-            observePlaylistsState().observe(viewLifecycleOwner) { playlists ->
-                adapter.updateData(playlists)
+            observePlaylists().observe(viewLifecycleOwner) { state ->
+                adapter.updateData(state.playlists)
+                when (state?.playerEvent) {
+                    is PlayerEvent.TrackAddSuccess -> {
+                        playlistBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+                        PlaylistUtil.showSnackbar(
+                            binding.root,
+                            requireActivity().getString(
+                                R.string.new_track_in_playlist_snackbar_text,
+                                state.playerEvent.playlistName
+                            ),
+                            PlaylistUtil.SnackbarLayoutTypes.COORDINATOR_LAYOUT,
+                        )
+                    }
+
+                    is PlayerEvent.TrackAddDuplicate -> PlaylistUtil.showSnackbar(
+                        binding.root,
+                        requireActivity().getString(R.string.track_exists_in_playlist_snackbar_text, state.playerEvent.playlistName),
+                        PlaylistUtil.SnackbarLayoutTypes.COORDINATOR_LAYOUT,
+                        )
+                    null -> Unit
+                }
             }
         }
     }
@@ -174,6 +196,7 @@ class AudioPlayerFragment : Fragment() {
             }
             state = BottomSheetBehavior.STATE_HIDDEN
 
+            skipCollapsed = true
 
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -192,7 +215,7 @@ class AudioPlayerFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = MiniPlaylistsAdapter(emptyList()) { playlist ->
-            playListsViewModel.addToPlaylist(track.trackId, playlist.id)
+            playListsViewModel.addToPlaylist(track.trackId, playlist)
         }
 
         recyclerView = binding.miniPlaylistsRecycler
@@ -234,6 +257,7 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        playListsViewModel.resetSnackbarState()
         playerViewModel.onPause()
     }
 

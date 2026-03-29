@@ -6,24 +6,57 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.playlists.PlaylistInteractor
+import com.practicum.playlistmaker.ui.media.models.PlayerEvent
+import com.practicum.playlistmaker.ui.media.models.PlaylistsState
 import kotlinx.coroutines.launch
 
 class PlaylistsViewModel(
     private val playlistInteractor: PlaylistInteractor
 ): ViewModel() {
 
-    private val _playlists = MutableLiveData<List<Playlist>>(emptyList())
-    fun observePlaylistsState(): LiveData<List<Playlist>> = _playlists
+    private var playlists = listOf<Playlist>()
+    private var playerEvent: PlayerEvent? = null
+    private var playlistsState = MutableLiveData(
+        PlaylistsState(
+            playlists = playlists,
+            playerEvent = playerEvent,
+        )
+    )
+
+    fun observePlaylists(): LiveData<PlaylistsState> = playlistsState
 
     fun getPlaylists() {
         viewModelScope.launch {
-            _playlists.postValue(playlistInteractor.getPlaylists())
+            playlists = playlistInteractor.getPlaylists()
+            playerEvent = null
+            postState()
         }
     }
 
-    fun addToPlaylist(trackId: Long, playlistId: Int) {
+    fun addToPlaylist(trackId: Long, playlist: Playlist) {
         viewModelScope.launch {
-            _playlists.postValue(playlistInteractor.addTrackToPlaylist(trackId, playlistId))
+            val trackIdsInPlaylist = playlistInteractor.getTrackIdsInPlaylist(playlist.id)
+            if (trackIdsInPlaylist?.contains(trackId) == false) {
+                playlists = playlistInteractor.addTrackToPlaylist(trackId, playlist.id) ?: playlists
+                playerEvent = PlayerEvent.TrackAddSuccess(playlist.name)
+            } else {
+                playerEvent = PlayerEvent.TrackAddDuplicate(playlist.name)
+            }
+            postState()
         }
+    }
+
+    fun resetSnackbarState() {
+        playerEvent = null
+        postState()
+    }
+
+    private fun postState() {
+        playlistsState.postValue(
+            PlaylistsState(
+                playlists,
+                playerEvent,
+            )
+        )
     }
 }

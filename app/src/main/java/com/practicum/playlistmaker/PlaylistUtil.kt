@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -34,7 +35,15 @@ object PlaylistUtil {
             .into(image)
     }
 
-    fun showSnackbar(rootView: View, message: String) {
+    enum class SnackbarLayoutTypes {
+        FRAME_LAYOUT,
+        COORDINATOR_LAYOUT,
+    }
+
+    fun showSnackbar(
+        rootView: View, message: String,
+        snackbarLayoutType: SnackbarLayoutTypes = SnackbarLayoutTypes.FRAME_LAYOUT
+    ) {
         val sb = Snackbar.make(rootView, "", Snackbar.LENGTH_SHORT)
 
         val container = sb.view as ViewGroup
@@ -48,14 +57,26 @@ object PlaylistUtil {
         custom.findViewById<TextView>(R.id.toast_text).text = message
         container.addView(custom)
 
-        sb.view.updateLayoutParams<FrameLayout.LayoutParams> {
-            width = ViewGroup.LayoutParams.MATCH_PARENT
-            gravity = Gravity.BOTTOM
-            val m = rootView.resources.getDimensionPixelSize(R.dimen.small_margin)
-            val g = rootView.resources.getDimensionPixelSize(R.dimen.snackbar_bottombar_margin)
-            setMargins(m, 0, m, g)
+        when (snackbarLayoutType) {
+            SnackbarLayoutTypes.FRAME_LAYOUT -> {
+                sb.view.updateLayoutParams<FrameLayout.LayoutParams> {
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    gravity = Gravity.BOTTOM
+                    val m = rootView.resources.getDimensionPixelSize(R.dimen.small_margin)
+                    val g = rootView.resources.getDimensionPixelSize(R.dimen.snackbar_bottombar_margin)
+                    setMargins(m, 0, m, g)
+                }
+            }
+            SnackbarLayoutTypes.COORDINATOR_LAYOUT -> {
+                sb.view.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    gravity = Gravity.BOTTOM
+                    val m = rootView.resources.getDimensionPixelSize(R.dimen.small_margin)
+                    val g = rootView.resources.getDimensionPixelSize(R.dimen.snackbar_bottombar_margin)
+                    setMargins(m, 0, m, g)
+                }
+            }
         }
-
         sb.show()
     }
 
