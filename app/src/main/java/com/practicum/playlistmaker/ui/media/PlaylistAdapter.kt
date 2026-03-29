@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ItemPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 
@@ -24,6 +25,8 @@ class PlaylistAdapter(var playlists: List<Playlist>) : RecyclerView.Adapter<Play
             trackCount.text = playlist.tracksAmount.toString()
             if (playlist.coverUri.isNotEmpty()) {
                 image.setImageURI(playlist.coverUri.toUri())
+            } else {
+                image.setImageResource(R.drawable.ic_placeholder)
             }
         }
 

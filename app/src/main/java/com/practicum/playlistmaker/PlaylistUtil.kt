@@ -11,6 +11,7 @@ import android.widget.TextView
 import androidx.core.view.updateLayoutParams
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -56,5 +57,35 @@ object PlaylistUtil {
         }
 
         sb.show()
+    }
+
+    fun showAlertDialog(
+        context: Context,
+        title: String,
+        message: String,
+        negativeBtnTitle: String,
+        positiveBtnTitle: String,
+        negativeBtnAction: () -> Unit,
+        positiveBtnAction: () -> Unit,
+    ) {
+        val dialog = MaterialAlertDialogBuilder(context)
+            .setTitle(title)
+            .setMessage(message)
+            .setNegativeButton(negativeBtnTitle) { dialog, which ->
+                negativeBtnAction()
+            }
+            .setPositiveButton(positiveBtnTitle) { dialog, which ->
+                positiveBtnAction()
+            }
+            .show()
+
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE)?.apply {
+            setTextColor(context.getColor(R.color.blue))
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        }
+        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)?.apply {
+            setTextColor(context.getColor(R.color.blue))
+            setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        }
     }
 }

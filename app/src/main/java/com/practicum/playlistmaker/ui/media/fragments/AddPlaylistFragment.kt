@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
@@ -13,6 +14,7 @@ import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.PlaylistUtil
+import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAddPlaylistBinding
 import com.practicum.playlistmaker.ui.media.viewmodel.AddPlaylistViewModel
 import com.practicum.playlistmaker.ui.root.RootActivity
@@ -54,11 +56,13 @@ class AddPlaylistFragment : Fragment() {
     private fun setListeners() {
         with(binding) {
             backBtn.setOnClickListener {
-                rootActivity.setBottomBarVisibility(true)
-                findNavController().popBackStack()
+                handleAbortAttempt()
             }
             playlistNameEt.doOnTextChanged { text, _, _, _ ->
-                createPlaylistButton.isEnabled = text?.isNotEmpty() == true
+                if (text?.isNotEmpty() == true) {
+                    createPlaylistButton.isEnabled = true
+                }
+
             }
             createPlaylistButton.setOnClickListener {
                 lifecycleScope.launch {
@@ -68,7 +72,13 @@ class AddPlaylistFragment : Fragment() {
                         description = playlistDescriptionEt.text.toString(),
                         coverUri = imageUri,
                     )
-                    PlaylistUtil.showSnackbar(binding.root, "Плейлист $name успешно создан")
+                    PlaylistUtil.showSnackbar(
+                        rootView = binding.root,
+                        message = getString(
+                            R.string.new_playlist_snackbar_text,
+                            name,
+                        )
+                    )
                     findNavController().popBackStack()
                 }
             }
@@ -76,6 +86,32 @@ class AddPlaylistFragment : Fragment() {
         binding.playlistCover.setOnClickListener {
             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
+
+        rootActivity.onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            handleAbortAttempt()
+        }
+    }
+
+    private fun handleAbortAttempt() {
+        if (hasUnsavedChanges()) {
+            PlaylistUtil.showAlertDialog(
+                context = rootActivity,
+                title = getString(R.string.abort_playlist_creation_question),
+                message = getString(R.string.abort_playlist_creation_message),
+                negativeBtnTitle = getString(R.string.no),
+                positiveBtnTitle = getString(R.string.yes),
+                negativeBtnAction = {},
+                positiveBtnAction = { findNavController().popBackStack() },
+            )
+        } else {
+            findNavController().popBackStack()
+        }
+    }
+
+    private fun hasUnsavedChanges(): Boolean {
+        return imageUri != null ||
+                binding.playlistNameEt.text?.isNotEmpty() == true ||
+                binding.playlistDescriptionEt.text?.isNotEmpty() == true
     }
 
     override fun onDestroy() {
