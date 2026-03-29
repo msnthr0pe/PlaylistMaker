@@ -30,4 +30,6 @@
     <string name="playlist_name">Название*</string>
     <string name="description">Описание</string>
     <string name="create">Создать</string>
+    <string name="default_num">123</string>
+    <string name="tracks">треков</string>
 </resources>

@@ -11,7 +11,9 @@ import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.navigation.fragment.findNavController
 import com.practicum.playlistmaker.databinding.FragmentAddPlaylistBinding
+import com.practicum.playlistmaker.ui.media.viewmodel.AddPlaylistViewModel
 import com.practicum.playlistmaker.ui.root.RootActivity
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AddPlaylistFragment : Fragment() {
 
@@ -19,7 +21,7 @@ class AddPlaylistFragment : Fragment() {
     private val binding: FragmentAddPlaylistBinding get() = _binding!!
     private val rootActivity by lazy { requireActivity() as RootActivity }
 
-
+    private val viewModel: AddPlaylistViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +48,7 @@ class AddPlaylistFragment : Fragment() {
                 if (uri != null) {
                     binding.playlistCoverImage.isVisible = false
                     binding.playlistCover.setImageURI(uri)
-                    //saveImageToPrivateStorage(uri)
+                    viewModel.saveImageToFile(uri, "2")
                 }
             }
         binding.playlistCover.setOnClickListener {

@@ -6,8 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistsBinding
+import com.practicum.playlistmaker.ui.media.PlaylistAdapter
 import com.practicum.playlistmaker.ui.media.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.ui.root.RootActivity
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -17,6 +20,8 @@ class PlaylistsFragment : Fragment() {
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding: FragmentPlaylistsBinding get() = _binding!!
     private val rootActivity by lazy { requireActivity() as RootActivity }
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: PlaylistAdapter
     private val viewModel: PlaylistsViewModel by viewModel()
 
     override fun onCreateView(
@@ -34,6 +39,11 @@ class PlaylistsFragment : Fragment() {
             findNavController().navigate(R.id.action_mediaFragment_to_addPlaylistFragment)
         }
 
+        adapter = PlaylistAdapter(viewModel.getStubPlaylists())
+
+        recyclerView = binding.playlistRecycler
+        recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        recyclerView.adapter = adapter
     }
 
     companion object {
