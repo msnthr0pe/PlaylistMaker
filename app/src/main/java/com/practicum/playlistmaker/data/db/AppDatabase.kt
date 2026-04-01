@@ -3,9 +3,10 @@ package com.practicum.playlistmaker.data.db
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(version = 1, entities = [FavouritesEntity::class])
+@Database(version = 1, entities = [FavouritesEntity::class, PlaylistEntity::class])
 abstract class AppDatabase : RoomDatabase(){
 
     abstract fun favouritesDao(): FavouritesDao
+    abstract fun playlistDao(): PlaylistDao
 
 }

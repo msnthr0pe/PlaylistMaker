@@ -5,21 +5,33 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentAudioPlayerBinding
 import com.practicum.playlistmaker.domain.models.Track
+import com.practicum.playlistmaker.ui.media.models.PlayerEvent
+import com.practicum.playlistmaker.ui.media.viewmodel.PlaylistsViewModel
 import com.practicum.playlistmaker.ui.player.viewmodel.PlayerViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class AudioPlayerFragment : Fragment() {
 
     private lateinit var binding: FragmentAudioPlayerBinding
-    private val viewModel: PlayerViewModel by viewModel()
+
+    private val playerViewModel: PlayerViewModel by viewModel()
+    private val playListsViewModel: PlaylistsViewModel by viewModel()
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: MiniPlaylistsAdapter
     private lateinit var playButton: ImageButton
+    private lateinit var playlistBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var currentTrackTime: TextView
     private lateinit var track: Track
 
@@ -60,10 +72,19 @@ class AudioPlayerFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setData()
+        setupBottomSheet()
         setViewModelObservers()
-        viewModel.setupFavouriteButtonState(track)
+        playListsViewModel.getPlaylists()
         preparePlayer()
         setOnClickListeners()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (playlistBottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+            binding.scrim.visibility = View.VISIBLE
+        }
+        playerViewModel.setupFavouriteButtonState(track)
     }
 
     private fun getTrack(): Track {
@@ -105,13 +126,39 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun setViewModelObservers() {
-        with (viewModel) {
+        with (playerViewModel) {
             observeAudioPlayerState().observe(viewLifecycleOwner) {
                 setPlayButtonImage()
                 currentTrackTime.text = it.progressTime
                 if (it.favouriteButtonState.shouldUpdateFavourites) {
                     track.isFavourite = it.favouriteButtonState.isFavourite
                     updateFavouriteButtonState()
+                }
+            }
+        }
+        with(playListsViewModel) {
+            observePlaylists().observe(viewLifecycleOwner) { state ->
+                adapter.updateData(state.playlists)
+                when (state?.playerEvent) {
+                    is PlayerEvent.TrackAddSuccess -> {
+                        playlistBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+                        PlaylistUtil.showSnackbar(
+                            binding.root,
+                            requireActivity().getString(
+                                R.string.new_track_in_playlist_snackbar_text,
+                                state.playerEvent.playlistName
+                            ),
+                            PlaylistUtil.SnackbarLayoutTypes.COORDINATOR_LAYOUT,
+                        )
+                    }
+
+                    is PlayerEvent.TrackAddDuplicate -> PlaylistUtil.showSnackbar(
+                        binding.root,
+                        requireActivity().getString(R.string.track_exists_in_playlist_snackbar_text, state.playerEvent.playlistName),
+                        PlaylistUtil.SnackbarLayoutTypes.COORDINATOR_LAYOUT,
+                        )
+                    null -> Unit
                 }
             }
         }
@@ -127,7 +174,7 @@ class AudioPlayerFragment : Fragment() {
     }
 
     private fun preparePlayer() {
-        viewModel.preparePlayer(
+        playerViewModel.preparePlayer(
             track.previewUrl,
             {
                 playButton.isEnabled = true
@@ -135,6 +182,45 @@ class AudioPlayerFragment : Fragment() {
             {
                 setPlayButtonImage()
             })
+    }
+
+    private fun setupBottomSheet() {
+
+        playlistBottomSheetBehavior = BottomSheetBehavior.from(binding.playerBottomSheet)
+
+        with(playlistBottomSheetBehavior) {
+            peekHeight = 0
+
+            binding.scrim.setOnClickListener {
+                state = BottomSheetBehavior.STATE_HIDDEN
+            }
+            state = BottomSheetBehavior.STATE_HIDDEN
+
+            skipCollapsed = true
+
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    val visible = newState != BottomSheetBehavior.STATE_HIDDEN
+                    binding.scrim.visibility = if (visible) View.VISIBLE else View.GONE
+                    if (!visible) binding.scrim.alpha = 0f
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    binding.scrim.alpha = 0.6f * slideOffset.coerceIn(0f, 1f)
+                }
+            })
+        }
+        setupRecyclerView()
+    }
+
+    private fun setupRecyclerView() {
+        adapter = MiniPlaylistsAdapter(emptyList()) { playlist ->
+            playListsViewModel.addToPlaylist(track.trackId, playlist)
+        }
+
+        recyclerView = binding.miniPlaylistsRecycler
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
     }
 
     private fun setOnClickListeners() {
@@ -145,18 +231,25 @@ class AudioPlayerFragment : Fragment() {
         }
         playButton = binding.playButton
         playButton.setOnClickListener {
-            viewModel.playbackControl()
+            playerViewModel.playbackControl()
         }
         binding.favoritesButton.setOnClickListener {
             track.isFavourite = !track.isFavourite
             updateFavouriteButtonState()
-            viewModel.onFavouritesButtonClicked(track)
+            playerViewModel.onFavouritesButtonClicked(track)
+        }
+        binding.addToPlaylistButton.setOnClickListener {
+            playlistBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+        binding.newPlaylistButton.setOnClickListener {
+            playerViewModel.resetPlayer()
+            findNavController().navigate(R.id.action_audioPlayerFragment_to_addPlaylistFragment)
         }
     }
 
     private fun setPlayButtonImage() {
         playButton.setImageResource(
-            if (viewModel.observeAudioPlayerState().value?.isPlaying == true){
+            if (playerViewModel.observeAudioPlayerState().value?.isPlaying == true){
                 R.drawable.ic_pause
             } else R.drawable.ic_play
         )
@@ -164,11 +257,12 @@ class AudioPlayerFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        viewModel.onPause()
+        playListsViewModel.resetSnackbarState()
+        playerViewModel.onPause()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        viewModel.onDestroy()
+        playerViewModel.onDestroy()
     }
 }

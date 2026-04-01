@@ -26,4 +26,28 @@
     <string name="country">Страна</string>
     <string name="your_media_is_empty">Ваша медиатека пуста</string>
     <string name="no_playlists_created">Вы не создали\nни одного плейлиста</string>
+    <string name="new_playlist">Новый плейлист</string>
+    <string name="playlist_name">Название*</string>
+    <string name="description">Описание</string>
+    <string name="create">Создать</string>
+    <string name="default_num">123</string>
+    <string name="tracks">треки</string>
+    <string name="new_playlist_snackbar_text">"Плейлист %1$s успешно создан"</string>
+    <string name="abort_playlist_creation_question">"Завершить создание плейлиста?"</string>
+    <string name="abort_playlist_creation_message">"Все несохранённые данные будут потеряны"</string>
+    <string name="yes">"Завершить"</string>
+    <string name="no">"Отмена"</string>
+    <string name="add_to_playlist">Добавить в плейлист</string>
+    <string name="new_track_in_playlist_snackbar_text">"Добавлено в плейлист %1$s"</string>
+    <string name="track_exists_in_playlist_snackbar_text">"Трек уже добавлен в плейлист %1$s"</string>
+    <string name="no_permission_text">"Необходим доступ к галерее для выбора обложки"</string>
+
+    <plurals name="tracks_count">
+        <item quantity="zero">%d треков</item>
+        <item quantity="one">%d трек</item>
+        <item quantity="two">%d трека</item>
+        <item quantity="few">%d трека</item>
+        <item quantity="many">%d треков</item>
+        <item quantity="other">%d треков</item>
+    </plurals>
 </resources>

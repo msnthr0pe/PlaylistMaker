@@ -1,24 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="MainScreenStyle" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="titleScreenBackground">@color/yp_black</item>
-
-        <item name="android:windowLightStatusBar">false</item>
-
-        <item name="materialButtonStyle">@style/MainButtonStyle</item>
-        <item name="android:textViewStyle">@style/MainTextView</item>
-        <item name="android:background">?attr/titleScreenBackground</item>
-    </style>
-
-    <style name="MainButtonStyle" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+    <style name="SmallCornerButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
         <item name="fontFamily">@font/ys_display_medium</item>
         <item name="android:letterSpacing">0</item>
-        <item name="android:backgroundTint">@color/white</item>
+        <item name="android:backgroundTint">@color/selector_button</item>
         <item name="android:foreground">?attr/selectableItemBackground</item>
-        <item name="android:textSize">@dimen/title_size</item>
+        <item name="android:textSize">@dimen/regular_size</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:textColor">@color/yp_black</item>
-        <item name="cornerRadius">@dimen/corner_radius</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">@dimen/small_corner_radius</item>
         <item name="android:insetTop">@dimen/default_inset</item>
         <item name="android:insetBottom">@dimen/default_inset</item>
     </style>
@@ -88,6 +78,15 @@
         <item name="iconColor">@color/white</item>
         <item name="genericTextColor">@color/white</item>
         <item name="android:fontFamily">@font/ys_display_regular</item>
+    </style>
+
+    <style name="AppTextInputLayout.Outlined" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/et_stroke_color</item>
+
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="boxStrokeWidthFocused">1dp</item>
+
+        <item name="hintTextColor">@color/et_stroke_color</item>
     </style>
 
 </resources>

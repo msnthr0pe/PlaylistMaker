@@ -82,7 +82,8 @@ class PlayerViewModel(
         }
         mediaPlayer.setOnCompletionListener {
             internalPlayerState = InternalPlayerState.PREPARED
-            mediaPlayer.seekTo(0)
+            playerJob?.cancel()
+            progressTime = DEFAULT_PROGRESS_TIME
             isPlaying = false
             postAudioPlayerState()
             onCompletedAction()
@@ -148,6 +149,26 @@ class PlayerViewModel(
             shouldUpdateFavourites = false,
             isFavourite = favouriteButtonState.isFavourite,
         )
+    }
+
+    fun resetPlayer() {
+        playerJob?.cancel()
+        mediaPlayer.setOnPreparedListener(null)
+        mediaPlayer.setOnCompletionListener(null)
+        mediaPlayer.setOnErrorListener(null)
+
+        try {
+            mediaPlayer.stop()
+        } catch (_: IllegalStateException) { }
+        mediaPlayer.release()
+
+        mediaPlayer = MediaPlayer()
+
+        internalPlayerState = InternalPlayerState.DEFAULT
+        progressTime = DEFAULT_PROGRESS_TIME
+        isPlaying = false
+
+        postAudioPlayerState()
     }
 
     companion object {

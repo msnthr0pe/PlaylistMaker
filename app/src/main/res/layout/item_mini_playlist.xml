@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:foreground="?attr/selectableItemBackground"
+    android:background="?attr/genericScreenBackground">
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/image_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="2dp"
+        android:layout_marginVertical="@dimen/small_margin"
+        android:layout_marginStart="13dp"
+        app:cardElevation="0dp">
+
+        <ImageView
+            android:id="@+id/playlist_mini_cover"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/poster"
+            android:background="?attr/genericScreenBackground"
+            android:scaleType="centerCrop"/>
+    </com.google.android.material.card.MaterialCardView>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/small_margin">
+
+        <TextView
+            android:id="@+id/playlist_mini_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/genericTextColor"
+            android:textSize="@dimen/regular_size"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/default_value"/>
+
+        <TextView
+            android:id="@+id/playlist_mini_track_amount"
+            android:textAppearance="@style/TrackInfoTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/small_size"
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:text="@string/default_value" />
+
+    </LinearLayout>
+
+
+</LinearLayout>

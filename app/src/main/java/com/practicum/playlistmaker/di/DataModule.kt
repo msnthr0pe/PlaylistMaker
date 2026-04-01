@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.practicum.playlistmaker.data.db.AppDatabase
+import com.practicum.playlistmaker.data.playlists.PlaylistImageLocalDataSource
 import com.practicum.playlistmaker.data.search.history.impl.PrefsStorageClient
 import com.practicum.playlistmaker.data.search.network.NetworkClient
 import com.practicum.playlistmaker.data.search.network.RetrofitNetworkClient
@@ -58,5 +59,9 @@ val dataModule = module {
     single {
         Room.databaseBuilder(androidContext(), AppDatabase::class.java, "database.db")
             .build()
+    }
+
+    single<PlaylistImageLocalDataSource> {
+        PlaylistImageLocalDataSource(get())
     }
 }
