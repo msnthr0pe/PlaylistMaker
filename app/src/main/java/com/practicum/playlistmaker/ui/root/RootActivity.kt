@@ -44,6 +44,7 @@ class RootActivity : AppCompatActivity() {
             when (destination.id) {
                 R.id.audioPlayerFragment,
                 R.id.addPlaylistFragment,
+                R.id.playlistFragment
                 -> {
                     bottomBar.visibility = View.GONE
                 }
