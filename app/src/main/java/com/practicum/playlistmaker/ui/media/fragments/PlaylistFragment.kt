@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
@@ -19,6 +20,8 @@ import com.practicum.playlistmaker.ui.player.AudioPlayerFragment
 import com.practicum.playlistmaker.ui.root.RootActivity
 import com.practicum.playlistmaker.ui.search.TrackAdapter
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlaylistFragment : Fragment() {
 
@@ -76,12 +79,25 @@ class PlaylistFragment : Fragment() {
             playlistDescription.text = playlist.description
             playlistDescription.isVisible = playlist.description.isNotEmpty()
             if (playlist.coverUri.isNotEmpty()) playlistCover.setImageURI(playlist.coverUri.toUri())
-            playlistTrackCount.text = requireActivity().resources.getQuantityString(
-                R.plurals.tracks_count,
-                playlist.tracksAmount,
-                playlist.tracksAmount,
-            )
+            updateTrackCount(playlist.tracksAmount)
         }
+    }
+
+    private fun updateTrackCount(trackCount: Int) {
+        binding.playlistTrackCount.text = requireActivity().resources.getQuantityString(
+            R.plurals.tracks_count,
+            trackCount,
+            trackCount,
+        )
+    }
+
+    private fun updateDuration(newDuration: Long) {
+        val formattedDuration = SimpleDateFormat("mm", Locale.getDefault()).format(newDuration).toInt()
+        binding.playlistDuration.text = requireActivity().resources.getQuantityString(
+            R.plurals.duration,
+            formattedDuration,
+            formattedDuration,
+        )
     }
 
     private fun getPlaylist(): Playlist {
@@ -104,6 +120,16 @@ class PlaylistFragment : Fragment() {
                     AudioPlayerFragment.createArgs(track)
                 )
             },
+            onItemLongClick = { track ->
+                PlaylistUtil.showAlertDialog(
+                    context = rootActivity,
+                    title = getString(R.string.delete_track_confirmation),
+                    negativeBtnTitle = getString(R.string.no),
+                    positiveBtnTitle = getString(R.string.yes),
+                    negativeBtnAction = {},
+                    positiveBtnAction = { viewModel.removeTrackFromPlaylist(track.trackId, playlist.id) },
+                )
+            }
         )
         recyclerView.layoutManager = LinearLayoutManager(rootActivity)
         recyclerView.adapter = adapter
@@ -111,7 +137,15 @@ class PlaylistFragment : Fragment() {
 
     private fun updateRecycler(newTracks: List<Track>) {
         adapter.updateData(newTracks)
+        updateTrackCount(newTracks.size)
+        updateTotalDuration(newTracks)
     }
+
+    private fun updateTotalDuration(tracks: List<Track>) {
+        val totalDuration = tracks.sumOf { it.trackTimeMillis }
+        updateDuration(totalDuration)
+    }
+
 
     private fun setOnClickListeners() {
         with (binding) {

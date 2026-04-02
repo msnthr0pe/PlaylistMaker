@@ -22,4 +22,9 @@ class PlaylistInteractorImpl(
     override suspend fun getTracksInPlaylist(playlistId: Int): List<Track> =
         playlistRepository.getTracksInPlaylist(playlistId)
 
+    override suspend fun removeTrackFromPlaylistAndGet(
+        trackId: Long,
+        playlistId: Int,
+    ): List<Track> =
+        playlistRepository.removeTrackFromPlaylistAndGet(trackId, playlistId)
 }

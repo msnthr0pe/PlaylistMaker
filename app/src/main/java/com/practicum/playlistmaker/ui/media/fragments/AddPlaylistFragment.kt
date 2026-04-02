@@ -111,8 +111,8 @@ class AddPlaylistFragment : Fragment() {
                 context = rootActivity,
                 title = getString(R.string.abort_playlist_creation_question),
                 message = getString(R.string.abort_playlist_creation_message),
-                negativeBtnTitle = getString(R.string.no),
-                positiveBtnTitle = getString(R.string.yes),
+                negativeBtnTitle = getString(R.string.cancel),
+                positiveBtnTitle = getString(R.string.end),
                 negativeBtnAction = {},
                 positiveBtnAction = { findNavController().popBackStack() },
             )

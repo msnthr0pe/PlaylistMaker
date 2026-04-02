@@ -29,6 +29,13 @@ class PlaylistViewModel(
         }
     }
 
+    fun removeTrackFromPlaylist(trackId: Long, playlistId: Int) {
+        viewModelScope.launch {
+            tracks = playlistInteractor.removeTrackFromPlaylistAndGet(trackId, playlistId)
+            postState()
+        }
+    }
+
     private fun postState() {
         playlistState.postValue(
             PlaylistState(

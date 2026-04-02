@@ -67,7 +67,9 @@ class FavouritesFragment : Fragment() {
         recycler = binding.favouritesRecycler
 
         viewModel.initLoadFavourites()
-        adapter = TrackAdapter(emptyList()) {
+        adapter = TrackAdapter(
+            tracks = emptyList(),
+            onItemClick = {
             if (clickDebounce()) {
 
                 rootActivity.setBottomBarVisibility(false)
@@ -76,7 +78,7 @@ class FavouritesFragment : Fragment() {
                     AudioPlayerFragment.createArgs(it))
 
             }
-        }
+        })
         recycler.adapter = adapter
     }
 

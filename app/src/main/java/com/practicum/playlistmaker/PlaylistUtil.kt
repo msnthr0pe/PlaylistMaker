@@ -83,7 +83,7 @@ object PlaylistUtil {
     fun showAlertDialog(
         context: Context,
         title: String,
-        message: String,
+        message: String = "",
         negativeBtnTitle: String,
         positiveBtnTitle: String,
         negativeBtnAction: () -> Unit,

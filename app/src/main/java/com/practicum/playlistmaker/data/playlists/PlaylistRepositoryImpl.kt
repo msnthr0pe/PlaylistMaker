@@ -39,6 +39,14 @@ class PlaylistRepositoryImpl(
     override suspend fun getPlaylists(): List<Playlist> =
         database.playlistDao().getPlaylists().map { playlistConverter.map(it) }
 
+    private suspend fun updateTrackCountInPlaylist(playlistId: Int, tracksAmount: Int) {
+        val playlistDao = database.playlistDao()
+        val playlist = playlistDao.getPlaylistById(playlistId)
+        playlist?.let {
+            playlistDao.updatePlaylist(playlist.copy(tracksAmount = tracksAmount))
+        }
+    }
+
     override suspend fun addTrackToPlaylist(track: Track, playlistId: Int): List<Playlist>? {
         return database.withTransaction {
             val playlistsTracksDao = database.playlistsTracksDao()
@@ -52,12 +60,9 @@ class PlaylistRepositoryImpl(
 
             database.tracksDao().insertTrack(trackConverter.map(track))
 
-            val playlistDao = database.playlistDao()
-            val playlist = playlistDao.getPlaylistById(playlistId)
-            playlist?.let {
-                playlistDao.updatePlaylist(playlist.copy(tracksAmount = trackIds.size))
-            }
+            updateTrackCountInPlaylist(playlistId, trackIds.size)
 
+            val playlistDao = database.playlistDao()
             playlistDao.getPlaylists().map { playlistConverter.map(it) }
         }
     }
@@ -71,6 +76,19 @@ class PlaylistRepositoryImpl(
             trackIds?.let {
                 database.tracksDao().getTracksByIds(it).map { trackConverter.map(it) }
             } ?: emptyList()
+        }
+    }
+
+    override suspend fun removeTrackFromPlaylistAndGet(
+        trackId: Long,
+        playlistId: Int,
+    ): List<Track> {
+        return database.withTransaction {
+            val playlistsTracksDao = database.playlistsTracksDao()
+            playlistsTracksDao.removeTrackFromPlaylist(playlistId, trackId)
+            val tracks = getTracksInPlaylist(playlistId)
+            updateTrackCountInPlaylist(playlistId, tracks.size)
+            tracks
         }
     }
 }
