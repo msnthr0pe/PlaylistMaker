@@ -44,8 +44,12 @@
     <string name="track_exists_in_playlist_snackbar_text">"Трек уже добавлен в плейлист %1$s"</string>
     <string name="no_permission_text">"Необходим доступ к галерее для выбора обложки"</string>
     <string name="delete_track_confirmation">"Хотите удалить трек?"</string>
+    <string name="delete_playlist_confirmation">"Хотите удалить плейлист "%1$s"?"</string>
     <string name="no_tracks_in_playlist">В плейлисте нет треков</string>
     <string name="unable_to_share">В этом плейлисте нет списка треков,\nкоторым можно поделиться</string>
+    <string name="share">Поделиться</string>
+    <string name="edit_info">Редактировать информацию</string>
+    <string name="delete_playlist">Удалить плейлист</string>
 
     <plurals name="tracks_count">
         <item quantity="zero">%d треков</item>

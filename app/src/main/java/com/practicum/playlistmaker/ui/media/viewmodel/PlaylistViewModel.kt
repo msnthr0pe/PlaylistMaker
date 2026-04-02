@@ -18,12 +18,14 @@ class PlaylistViewModel(
     private var tracks: List<Track>? = null
     private var duration: Int? = null
     private var sharingString: String? = null
+    private var isDeleted: Boolean? = null
 
     private val playlistState = MutableLiveData(
         PlaylistState(
             tracks,
             duration,
-            sharingString
+            sharingString,
+            isDeleted,
         )
     )
     fun observePlaylistState(): LiveData<PlaylistState> = playlistState
@@ -45,6 +47,14 @@ class PlaylistViewModel(
         viewModelScope.launch {
             tracks = playlistInteractor.removeTrackFromPlaylistAndGet(trackId, playlistId)
             duration = getTotalDuration()
+            postState()
+        }
+    }
+
+    fun removePlaylist(playlistId: Int) {
+        viewModelScope.launch {
+            playlistInteractor.removePlaylist(playlistId)
+            isDeleted = true
             postState()
         }
     }
@@ -71,6 +81,7 @@ class PlaylistViewModel(
                 tracks,
                 duration,
                 sharingString,
+                isDeleted,
             )
         )
     }

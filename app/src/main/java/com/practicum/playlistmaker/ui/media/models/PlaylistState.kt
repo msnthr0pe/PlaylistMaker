@@ -6,4 +6,5 @@ data class PlaylistState(
     val tracks: List<Track>?,
     val duration: Int?,
     val sharingString: String?,
+    val isDeleted: Boolean?,
 )

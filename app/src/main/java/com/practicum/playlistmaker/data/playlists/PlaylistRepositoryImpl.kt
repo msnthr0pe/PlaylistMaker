@@ -94,4 +94,19 @@ class PlaylistRepositoryImpl(
             tracks
         }
     }
+
+    override suspend fun removePlaylist(playlistId: Int) {
+        database.withTransaction {
+            val playlistsTracksDao = database.playlistsTracksDao()
+            val tracksInPlaylist = playlistsTracksDao.getTrackIdsInPlaylist(playlistId)
+            database.playlistDao().removePlaylist(playlistId)
+            playlistsTracksDao.removePlaylist(playlistId)
+            tracksInPlaylist.forEach { trackId ->
+                if (playlistsTracksDao.countPlaylistsForTrack(trackId) == 0) {
+                    database.tracksDao().removeTrack(trackId)
+                }
+            }
+            tracksInPlaylist.size
+        }
+    }
 }

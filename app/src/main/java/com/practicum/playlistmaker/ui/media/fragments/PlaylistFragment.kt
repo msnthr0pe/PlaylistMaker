@@ -5,12 +5,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentPlaylistBinding
@@ -35,6 +38,7 @@ class PlaylistFragment : Fragment() {
     private lateinit var adapter: TrackAdapter
 
     private lateinit var playlist: Playlist
+    private lateinit var playlistBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     companion object {
 
@@ -65,6 +69,7 @@ class PlaylistFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         configureRecycler()
         setData()
+        setupMoreBottomSheet()
         setOnClickListeners()
         setViewModelObserver()
         getPlaylistTracks()
@@ -78,12 +83,12 @@ class PlaylistFragment : Fragment() {
             playlistDescription.text = playlist.description
             playlistDescription.isVisible = playlist.description.isNotEmpty()
             if (playlist.coverUri.isNotEmpty()) playlistCover.setImageURI(playlist.coverUri.toUri())
-            updateTrackCount(playlist.tracksAmount)
+            binding.playlistTrackCount.updateTrackCount(playlist.tracksAmount)
         }
     }
 
-    private fun updateTrackCount(trackCount: Int) {
-        binding.playlistTrackCount.text = requireActivity().resources.getQuantityString(
+    private fun TextView.updateTrackCount(trackCount: Int) {
+        text = requireActivity().resources.getQuantityString(
             R.plurals.tracks_count,
             trackCount,
             trackCount,
@@ -106,6 +111,46 @@ class PlaylistFragment : Fragment() {
             arguments?.getString(ARGS_PLAYLIST_COVER) ?: "",
             arguments?.getInt(ARGS_TRACK_AMOUNT) ?: 0,
         )
+    }
+
+    private fun setupMoreBottomSheet() {
+        with(binding) {
+            playlistMoreBottomSheet.isClickable = true
+            currentPlaylistItem.apply {
+                itemMiniPlaylistLayout.foreground = null
+                if (playlist.coverUri.isNotEmpty()) playlistMiniCover.setImageURI(playlist.coverUri.toUri())
+                playlistMiniTitle.text = playlist.name
+                playlistMiniTrackAmount.updateTrackCount(playlist.tracksAmount)
+            }
+            sharePlaylistMore.moreItemText.text = getString(R.string.share)
+            editPlaylist.moreItemText.text = getString(R.string.edit_info)
+            deletePlaylist.moreItemText.text = getString(R.string.delete_playlist)
+        }
+
+        playlistBottomSheetBehavior = BottomSheetBehavior.from(binding.playlistMoreBottomSheet)
+
+        with(playlistBottomSheetBehavior) {
+            peekHeight = 0
+
+            binding.scrim.setOnClickListener {
+                state = BottomSheetBehavior.STATE_HIDDEN
+            }
+            state = BottomSheetBehavior.STATE_HIDDEN
+
+            skipCollapsed = true
+
+            addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    val visible = newState != BottomSheetBehavior.STATE_HIDDEN
+                    binding.scrim.visibility = if (visible) View.VISIBLE else View.GONE
+                    if (!visible) binding.scrim.alpha = 0f
+                }
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                    binding.scrim.alpha = 0.6f * slideOffset.coerceIn(0f, 1f)
+                }
+            })
+        }
     }
 
     private fun configureRecycler() {
@@ -135,7 +180,7 @@ class PlaylistFragment : Fragment() {
 
     private fun updateRecycler(newTracks: List<Track>) {
         adapter.updateData(newTracks)
-        updateTrackCount(newTracks.size)
+        binding.playlistTrackCount.updateTrackCount(newTracks.size)
     }
 
 
@@ -146,6 +191,22 @@ class PlaylistFragment : Fragment() {
             }
             sharePlaylist.setOnClickListener {
                 viewModel.buildStringForSharing()
+            }
+            playlistMore.setOnClickListener {
+                playlistBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
+            sharePlaylistMore.itemMorePlaylistLayout.setOnClickListener {
+                viewModel.buildStringForSharing()
+            }
+            deletePlaylist.itemMorePlaylistLayout.setOnClickListener {
+                PlaylistUtil.showAlertDialog(
+                    context = rootActivity,
+                    title = getString(R.string.delete_playlist_confirmation, playlist.name),
+                    negativeBtnTitle = getString(R.string.no),
+                    positiveBtnTitle = getString(R.string.yes),
+                    negativeBtnAction = {},
+                    positiveBtnAction = { viewModel.removePlaylist(playlist.id) },
+                )
             }
         }
     }
@@ -176,6 +237,11 @@ class PlaylistFragment : Fragment() {
             }
             playlistState.duration?.let {
                 updateDuration(it)
+            }
+            playlistState.isDeleted?.let { isDeleted ->
+                if (isDeleted) {
+                    findNavController().popBackStack()
+                }
             }
         }
     }
