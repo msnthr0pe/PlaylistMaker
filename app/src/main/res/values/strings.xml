@@ -45,6 +45,7 @@
     <string name="no_permission_text">"Необходим доступ к галерее для выбора обложки"</string>
     <string name="delete_track_confirmation">"Хотите удалить трек?"</string>
     <string name="no_tracks_in_playlist">В плейлисте нет треков</string>
+    <string name="unable_to_share">В этом плейлисте нет списка треков,\nкоторым можно поделиться</string>
 
     <plurals name="tracks_count">
         <item quantity="zero">%d треков</item>

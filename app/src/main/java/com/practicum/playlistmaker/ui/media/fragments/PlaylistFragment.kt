@@ -1,5 +1,6 @@
 package com.practicum.playlistmaker.ui.media.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,8 +21,6 @@ import com.practicum.playlistmaker.ui.player.AudioPlayerFragment
 import com.practicum.playlistmaker.ui.root.RootActivity
 import com.practicum.playlistmaker.ui.search.TrackAdapter
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlaylistFragment : Fragment() {
 
@@ -91,12 +90,11 @@ class PlaylistFragment : Fragment() {
         )
     }
 
-    private fun updateDuration(newDuration: Long) {
-        val formattedDuration = SimpleDateFormat("mm", Locale.getDefault()).format(newDuration).toInt()
+    private fun updateDuration(newDuration: Int) {
         binding.playlistDuration.text = requireActivity().resources.getQuantityString(
             R.plurals.duration,
-            formattedDuration,
-            formattedDuration,
+            newDuration,
+            newDuration,
         )
     }
 
@@ -138,12 +136,6 @@ class PlaylistFragment : Fragment() {
     private fun updateRecycler(newTracks: List<Track>) {
         adapter.updateData(newTracks)
         updateTrackCount(newTracks.size)
-        updateTotalDuration(newTracks)
-    }
-
-    private fun updateTotalDuration(tracks: List<Track>) {
-        val totalDuration = tracks.sumOf { it.trackTimeMillis }
-        updateDuration(totalDuration)
     }
 
 
@@ -152,7 +144,17 @@ class PlaylistFragment : Fragment() {
             backBtn.setOnClickListener {
                 findNavController().popBackStack()
             }
+            sharePlaylist.setOnClickListener {
+                viewModel.buildStringForSharing()
+            }
         }
+    }
+
+    private fun showPlaylistSharingChooser(sharingString: String) {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.putExtra(Intent.EXTRA_TEXT, sharingString)
+        intent.type = "text/plain"
+        startActivity(Intent.createChooser(intent, null))
     }
 
     private fun setViewModelObserver() {
@@ -160,6 +162,20 @@ class PlaylistFragment : Fragment() {
             playlistState.tracks?.let {
                 updateRecycler(playlistState.tracks)
                 configurePlaceholderVisibility()
+                playlistState.sharingString?.let {
+                    if (playlistState.tracks.isNotEmpty()) {
+                        showPlaylistSharingChooser(it)
+                    } else {
+                        PlaylistUtil.showSnackbar(
+                            rootView = binding.root,
+                            message = getString(R.string.unable_to_share),
+                            snackbarLayoutType = PlaylistUtil.SnackbarLayoutTypes.COORDINATOR_LAYOUT
+                        )
+                    }
+                }
+            }
+            playlistState.duration?.let {
+                updateDuration(it)
             }
         }
     }

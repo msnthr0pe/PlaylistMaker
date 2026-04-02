@@ -8,16 +8,22 @@ import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.playlists.PlaylistInteractor
 import com.practicum.playlistmaker.ui.media.models.PlaylistState
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class PlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
 ) : ViewModel() {
 
     private var tracks: List<Track>? = null
+    private var duration: Int? = null
+    private var sharingString: String? = null
 
     private val playlistState = MutableLiveData(
         PlaylistState(
             tracks,
+            duration,
+            sharingString
         )
     )
     fun observePlaylistState(): LiveData<PlaylistState> = playlistState
@@ -25,21 +31,46 @@ class PlaylistViewModel(
     fun getTracksByPlaylist(playlistId: Int) {
         viewModelScope.launch {
             tracks = playlistInteractor.getTracksInPlaylist(playlistId)
+            duration = getTotalDuration()
             postState()
         }
+    }
+
+    private fun getTotalDuration(): Int {
+        val totalDuration = tracks?.sumOf { it.trackTimeMillis }
+        return convertToMinutes(totalDuration ?: 0)
     }
 
     fun removeTrackFromPlaylist(trackId: Long, playlistId: Int) {
         viewModelScope.launch {
             tracks = playlistInteractor.removeTrackFromPlaylistAndGet(trackId, playlistId)
+            duration = getTotalDuration()
             postState()
         }
     }
 
+    fun buildStringForSharing() {
+        sharingString = buildString {
+            appendLine("${tracks?.size ?: 0} треков")
+            tracks?.let { tracks ->
+                tracks.forEachIndexed { index, track ->
+                    appendLine("${index + 1}. ${track.artistName} - ${track.trackName} (${convertToMinutes(track.trackTimeMillis)} минут)")
+                }
+            }
+        }
+        postState()
+        sharingString = null
+    }
+
+    private fun convertToMinutes(millis: Long) =
+        SimpleDateFormat("mm", Locale.getDefault()).format(millis).toInt()
+
     private fun postState() {
         playlistState.postValue(
             PlaylistState(
-                tracks = tracks,
+                tracks,
+                duration,
+                sharingString,
             )
         )
     }
