@@ -5,6 +5,5 @@ data class Playlist(
     val name: String,
     val description: String,
     val coverUri: String,
-    val trackIds: List<Int>,
     val tracksAmount: Int,
 )

@@ -28,7 +28,6 @@ class PlaylistFragment : Fragment() {
         private const val ARGS_PLAYLIST_NAME = "playlist.name"
         private const val ARGS_PLAYLIST_DESCRIPTION = "playlist.description"
         private const val ARGS_PLAYLIST_COVER = "playlist.cover"
-        private const val ARGS_TRACK_IDS = "playlist.trackIds"
         private const val ARGS_TRACK_AMOUNT = "playlist.trackAmount"
 
         fun createArgs(playlist: Playlist) = Bundle().apply {
@@ -36,7 +35,6 @@ class PlaylistFragment : Fragment() {
             putString(ARGS_PLAYLIST_NAME, playlist.name)
             putString(ARGS_PLAYLIST_DESCRIPTION, playlist.description)
             putString(ARGS_PLAYLIST_COVER, playlist.coverUri)
-            putIntArray(ARGS_TRACK_IDS, playlist.trackIds.toIntArray())
             putInt(ARGS_TRACK_AMOUNT, playlist.tracksAmount)
         }
     }
@@ -77,8 +75,6 @@ class PlaylistFragment : Fragment() {
             arguments?.getString(ARGS_PLAYLIST_NAME) ?: "",
             arguments?.getString(ARGS_PLAYLIST_DESCRIPTION) ?: "",
             arguments?.getString(ARGS_PLAYLIST_COVER) ?: "",
-            arguments?.getIntArray(ARGS_TRACK_IDS)?.toList() ?: emptyList(),
-
             arguments?.getInt(ARGS_TRACK_AMOUNT) ?: 0,
         )
     }
