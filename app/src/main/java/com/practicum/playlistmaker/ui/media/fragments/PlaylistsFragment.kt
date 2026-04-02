@@ -51,7 +51,7 @@ class PlaylistsFragment : Fragment() {
     private fun setClickListeners() {
         binding.newPlaylistButton.setOnClickListener {
             rootActivity.setBottomBarVisibility(false)
-            findNavController().navigate(R.id.action_mediaFragment_to_addPlaylistFragment)
+            findNavController().navigate(R.id.action_mediaFragment_to_editPlaylistFragment)
         }
     }
 

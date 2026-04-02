@@ -243,7 +243,7 @@ class AudioPlayerFragment : Fragment() {
         }
         binding.newPlaylistButton.setOnClickListener {
             playerViewModel.resetPlayer()
-            findNavController().navigate(R.id.action_audioPlayerFragment_to_addPlaylistFragment)
+            findNavController().navigate(R.id.action_audioPlayerFragment_to_editPlaylistFragment)
         }
     }
 

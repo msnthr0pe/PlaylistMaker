@@ -55,6 +55,19 @@ class PlaylistFragment : Fragment() {
             putString(ARGS_PLAYLIST_COVER, playlist.coverUri)
             putInt(ARGS_TRACK_AMOUNT, playlist.tracksAmount)
         }
+        fun createArgs(
+            id: Int,
+            name: String,
+            description: String,
+            coverUri: String,
+            tracksAmount: Int,
+        ) = Bundle().apply {
+            putInt(ARGS_PLAYLIST_ID, id)
+            putString(ARGS_PLAYLIST_NAME, name)
+            putString(ARGS_PLAYLIST_DESCRIPTION, description)
+            putString(ARGS_PLAYLIST_COVER, coverUri)
+            putInt(ARGS_TRACK_AMOUNT, tracksAmount)
+        }
     }
 
     override fun onCreateView(
@@ -197,8 +210,16 @@ class PlaylistFragment : Fragment() {
             }
             sharePlaylistMore.itemMorePlaylistLayout.setOnClickListener {
                 viewModel.buildStringForSharing()
+                playlistBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
+            editPlaylist.itemMorePlaylistLayout.setOnClickListener {
+                findNavController().navigate(
+                    R.id.action_playlistFragment_to_editPlaylistFragment,
+                    EditPlaylistFragment.createArgs(playlist)
+                )
             }
             deletePlaylist.itemMorePlaylistLayout.setOnClickListener {
+                playlistBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 PlaylistUtil.showAlertDialog(
                     context = rootActivity,
                     title = getString(R.string.delete_playlist_confirmation, playlist.name),
@@ -253,6 +274,11 @@ class PlaylistFragment : Fragment() {
     private fun configurePlaceholderVisibility() {
         recyclerView.isVisible = adapter.itemCount != 0
         binding.playlistPlaceholder.isVisible = adapter.itemCount == 0
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewModel.resetSharingState()
     }
 
     override fun onDestroy() {

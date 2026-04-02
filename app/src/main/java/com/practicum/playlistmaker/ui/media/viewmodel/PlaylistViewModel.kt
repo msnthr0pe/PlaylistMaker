@@ -69,7 +69,11 @@ class PlaylistViewModel(
             }
         }
         postState()
+    }
+
+    fun resetSharingState() {
         sharingString = null
+        postState()
     }
 
     private fun convertToMinutes(millis: Long) =

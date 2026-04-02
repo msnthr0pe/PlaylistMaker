@@ -29,8 +29,8 @@
             android:id="@+id/action_mediaFragment_to_audioPlayerFragment"
             app:destination="@id/audioPlayerFragment" />
         <action
-            android:id="@+id/action_mediaFragment_to_addPlaylistFragment"
-            app:destination="@id/addPlaylistFragment" />
+            android:id="@+id/action_mediaFragment_to_editPlaylistFragment"
+            app:destination="@id/editPlaylistFragment" />
         <action
             android:id="@+id/action_mediaFragment_to_playlistFragment"
             app:destination="@id/playlistFragment" />
@@ -57,14 +57,17 @@
         android:label="activity_audio_player"
         tools:layout="@layout/fragment_audio_player" >
         <action
-            android:id="@+id/action_audioPlayerFragment_to_addPlaylistFragment"
-            app:destination="@id/addPlaylistFragment" />
+            android:id="@+id/action_audioPlayerFragment_to_editPlaylistFragment"
+            app:destination="@id/editPlaylistFragment" />
     </fragment>
     <fragment
-        android:id="@+id/addPlaylistFragment"
-        android:name="com.practicum.playlistmaker.ui.media.fragments.AddPlaylistFragment"
+        android:id="@+id/editPlaylistFragment"
+        android:name="com.practicum.playlistmaker.ui.media.fragments.EditPlaylistFragment"
         android:label="activity_settings"
-        tools:layout="@layout/fragment_add_playlist" >
+        tools:layout="@layout/fragment_edit_playlist" >
+        <action
+            android:id="@+id/action_editPlaylistFragment_to_playlistFragment"
+            app:destination="@id/playlistFragment" />
     </fragment>
     <fragment
         android:id="@+id/playlistFragment"
@@ -74,5 +77,8 @@
         <action
             android:id="@+id/action_playlistFragment_to_audioPlayerFragment"
             app:destination="@id/audioPlayerFragment" />
+        <action
+            android:id="@+id/action_playlistFragment_to_editPlaylistFragment"
+            app:destination="@id/editPlaylistFragment" />
     </fragment>
 </navigation>

@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.domain.playlists
 
 import android.net.Uri
+import com.practicum.playlistmaker.domain.models.EditPlaylistModel
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.models.Track
 
@@ -20,4 +21,5 @@ interface PlaylistInteractor {
     suspend fun getTracksInPlaylist(playlistId: Int): List<Track>
     suspend fun removeTrackFromPlaylistAndGet(trackId: Long, playlistId: Int): List<Track>
     suspend fun removePlaylist(playlistId: Int)
+    suspend fun updatePlaylist(playlist: EditPlaylistModel): String
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/genericScreenBackground"
-    tools:context=".ui.media.fragments.AddPlaylistFragment">
+    tools:context=".ui.media.fragments.EditPlaylistFragment">
 
     <ImageView
         android:id="@+id/back_btn"
@@ -19,6 +19,7 @@
         app:tint="?attr/genericTextColor" />
 
     <TextView
+        android:id="@+id/toolbar_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/medium_margin"

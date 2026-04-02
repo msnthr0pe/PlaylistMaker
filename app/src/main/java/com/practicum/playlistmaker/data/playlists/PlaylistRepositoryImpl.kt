@@ -6,6 +6,7 @@ import com.practicum.playlistmaker.data.db.AppDatabase
 import com.practicum.playlistmaker.data.db.PlaylistEntity
 import com.practicum.playlistmaker.data.db.PlaylistToTrackEntity
 import com.practicum.playlistmaker.data.player.TrackDbConverter
+import com.practicum.playlistmaker.domain.models.EditPlaylistModel
 import com.practicum.playlistmaker.domain.models.Playlist
 import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.playlists.PlaylistRepository
@@ -17,23 +18,36 @@ class PlaylistRepositoryImpl(
     private val trackConverter: TrackDbConverter,
 ): PlaylistRepository {
     override suspend fun createPlaylist(name: String, description: String, coverUri: Uri?): Long {
-        var path = ""
+        return database.withTransaction {
+            val playlistDao = database.playlistDao()
+            val lastInsertedId = playlistDao.insertPlaylist(
+                PlaylistEntity(
+                    playlistId = 0,
+                    name = name,
+                    description = description,
+                    coverUri = "",
+                    tracksAmount = 0,
+                )
+            )
+            saveImage(lastInsertedId.toInt(), coverUri)
+
+            lastInsertedId
+        }
+    }
+
+    private suspend fun saveImage(id: Int, coverUri: Uri?, pathCallback: ((String) -> Unit) = {}) {
+        val playlistDao = database.playlistDao()
         coverUri?.let {
-            playlistImageLocalDataSource.savePlaylistCover(coverUri, name)
+            playlistImageLocalDataSource.savePlaylistCover(coverUri, id.toString())
                 .onSuccess { file ->
-                    path = file.absolutePath
+                    val playlist = playlistDao.getPlaylistById(id)
+                    playlist?.let {
+                        val absolutePath = file.absolutePath
+                        pathCallback(absolutePath)
+                        playlistDao.updatePlaylist(playlist.copy(coverUri = absolutePath))
+                    }
                 }
         }
-
-        return database.playlistDao().insertPlaylist(
-            PlaylistEntity(
-                playlistId = 0,
-                name = name,
-                description = description,
-                coverUri = path,
-                tracksAmount = 0,
-            )
-        )
     }
 
     override suspend fun getPlaylists(): List<Playlist> =
@@ -73,9 +87,16 @@ class PlaylistRepositoryImpl(
     override suspend fun getTracksInPlaylist(playlistId: Int): List<Track> {
         return database.withTransaction {
             val trackIds = getTrackIdsInPlaylist(playlistId)
-            trackIds?.let {
-                database.tracksDao().getTracksByIds(it).map { trackConverter.map(it) }
-            } ?: emptyList()
+
+            if (trackIds.isNullOrEmpty()) {
+                emptyList()
+            } else {
+                val tracks = database.tracksDao().getTracksByIds(trackIds)
+                val trackMap = tracks.associateBy { it.trackId }
+
+                trackIds.mapNotNull { trackMap[it] }
+                    .map { trackConverter.map(it) }
+            }
         }
     }
 
@@ -108,5 +129,19 @@ class PlaylistRepositoryImpl(
             }
             tracksInPlaylist.size
         }
+    }
+
+    override suspend fun updatePlaylist(playlist: EditPlaylistModel): String {
+        val playlistDao = database.playlistDao()
+        var path = ""
+        saveImage(playlist.id, playlist.coverUri) { absolutePath ->
+            path = absolutePath
+        }
+        playlistDao.updatePlaylist(
+            playlistId = playlist.id,
+            name = playlist.name,
+            description = playlist.description,
+        )
+        return path
     }
 }
