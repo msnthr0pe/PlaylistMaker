@@ -87,7 +87,10 @@ class PlaylistRepositoryImpl(
             val playlistsTracksDao = database.playlistsTracksDao()
             playlistsTracksDao.removeTrackFromPlaylist(playlistId, trackId)
             val tracks = getTracksInPlaylist(playlistId)
-            updateTrackCountInPlaylist(playlistId, tracks.size)
+            if (playlistsTracksDao.countPlaylistsForTrack(trackId) == 0) {
+                database.tracksDao().removeTrack(trackId)
+            }
+             updateTrackCountInPlaylist(playlistId, tracks.size)
             tracks
         }
     }

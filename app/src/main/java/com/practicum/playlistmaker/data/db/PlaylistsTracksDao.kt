@@ -16,4 +16,8 @@ interface PlaylistsTracksDao {
 
     @Query("SELECT trackId FROM playlist_track WHERE playlistId = :playlistId ORDER BY createdAt DESC")
     suspend fun getTrackIdsInPlaylist(playlistId: Int): List<Long>
+
+    @Query("SELECT COUNT(*) FROM playlist_track WHERE trackId = :trackId")
+    suspend fun countPlaylistsForTrack(trackId: Long): Int
+
 }
