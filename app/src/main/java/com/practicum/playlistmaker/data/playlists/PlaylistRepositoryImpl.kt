@@ -5,13 +5,16 @@ import androidx.room.withTransaction
 import com.practicum.playlistmaker.data.db.AppDatabase
 import com.practicum.playlistmaker.data.db.PlaylistEntity
 import com.practicum.playlistmaker.data.db.PlaylistToTrackEntity
+import com.practicum.playlistmaker.data.player.TrackDbConverter
 import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.playlists.PlaylistRepository
 
 class PlaylistRepositoryImpl(
     private val playlistImageLocalDataSource: PlaylistImageLocalDataSource,
     private val database: AppDatabase,
-    private val converter: PlaylistDbConverter,
+    private val playlistConverter: PlaylistDbConverter,
+    private val trackConverter: TrackDbConverter,
 ): PlaylistRepository {
     override suspend fun createPlaylist(name: String, description: String, coverUri: Uri?): Long {
         var path = ""
@@ -34,18 +37,20 @@ class PlaylistRepositoryImpl(
     }
 
     override suspend fun getPlaylists(): List<Playlist> =
-        database.playlistDao().getPlaylists().map { converter.map(it) }
+        database.playlistDao().getPlaylists().map { playlistConverter.map(it) }
 
-    override suspend fun addTrackToPlaylist(trackId: Long, playlistId: Int): List<Playlist>? {
+    override suspend fun addTrackToPlaylist(track: Track, playlistId: Int): List<Playlist>? {
         return database.withTransaction {
             val playlistsTracksDao = database.playlistsTracksDao()
             playlistsTracksDao.insertTrackIntoPlaylist(
                 PlaylistToTrackEntity(
                     playlistId = playlistId,
-                    trackId = trackId,
+                    trackId = track.trackId,
                 )
             )
             val trackIds = playlistsTracksDao.getTrackIdsInPlaylist(playlistId)
+
+            database.tracksDao().insertTrack(trackConverter.map(track))
 
             val playlistDao = database.playlistDao()
             val playlist = playlistDao.getPlaylistById(playlistId)
@@ -53,10 +58,19 @@ class PlaylistRepositoryImpl(
                 playlistDao.updatePlaylist(playlist.copy(tracksAmount = trackIds.size))
             }
 
-            playlistDao.getPlaylists().map { converter.map(it) }
+            playlistDao.getPlaylists().map { playlistConverter.map(it) }
         }
     }
 
     override suspend fun getTrackIdsInPlaylist(playlistId: Int): List<Long>? =
         database.playlistsTracksDao().getTrackIdsInPlaylist(playlistId)
+
+    override suspend fun getTracksInPlaylist(playlistId: Int): List<Track> {
+        return database.withTransaction {
+            val trackIds = getTrackIdsInPlaylist(playlistId)
+            trackIds?.let {
+                database.tracksDao().getTracksByIds(it).map { trackConverter.map(it) }
+            } ?: emptyList()
+        }
+    }
 }

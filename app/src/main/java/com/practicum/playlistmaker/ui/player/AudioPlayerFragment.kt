@@ -215,7 +215,7 @@ class AudioPlayerFragment : Fragment() {
 
     private fun setupRecyclerView() {
         adapter = MiniPlaylistsAdapter(emptyList()) { playlist ->
-            playListsViewModel.addToPlaylist(track.trackId, playlist)
+            playListsViewModel.addToPlaylist(track, playlist)
         }
 
         recyclerView = binding.miniPlaylistsRecycler

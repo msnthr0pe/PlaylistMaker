@@ -8,7 +8,7 @@ import androidx.room.Query
 
 @Dao
 interface TracksDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertTrack(track: TrackEntity)
 
     @Delete
@@ -19,4 +19,7 @@ interface TracksDao {
 
     @Query("SELECT trackId FROM favourites ORDER BY createdAt DESC")
     suspend fun getTracksIds(): List<Long>
+
+    @Query("SELECT * FROM tracks WHERE trackId IN (:trackIds)")
+    suspend fun getTracksByIds(trackIds: List<Long>): List<TrackEntity>
 }
