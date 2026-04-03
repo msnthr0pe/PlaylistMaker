@@ -35,7 +35,7 @@ class PlaylistRepositoryImpl(
         }
     }
 
-    private suspend fun saveImage(id: Int, coverUri: Uri?, pathCallback: ((String) -> Unit) = {}) {
+    private suspend fun saveImage(id: Int, coverUri: Uri?) {
         val playlistDao = database.playlistDao()
         coverUri?.let {
             playlistImageLocalDataSource.savePlaylistCover(coverUri, id.toString())
@@ -43,7 +43,6 @@ class PlaylistRepositoryImpl(
                     val playlist = playlistDao.getPlaylistById(id)
                     playlist?.let {
                         val absolutePath = file.absolutePath
-                        pathCallback(absolutePath)
                         playlistDao.updatePlaylist(playlist.copy(coverUri = absolutePath))
                     }
                 }
@@ -52,6 +51,13 @@ class PlaylistRepositoryImpl(
 
     override suspend fun getPlaylists(): List<Playlist> =
         database.playlistDao().getPlaylists().map { playlistConverter.map(it) }
+
+    override suspend fun getPlaylistById(id: Int): Playlist? {
+        val playlistEntity = database.playlistDao().getPlaylistById(id)
+        return playlistEntity?.let {
+            playlistConverter.map(playlistEntity)
+        }
+    }
 
     private suspend fun updateTrackCountInPlaylist(playlistId: Int, tracksAmount: Int) {
         val playlistDao = database.playlistDao()
@@ -131,17 +137,19 @@ class PlaylistRepositoryImpl(
         }
     }
 
-    override suspend fun updatePlaylist(playlist: EditPlaylistModel): String {
-        val playlistDao = database.playlistDao()
-        var path = ""
-        saveImage(playlist.id, playlist.coverUri) { absolutePath ->
-            path = absolutePath
+    override suspend fun updatePlaylist(playlist: EditPlaylistModel): Playlist? {
+        return database.withTransaction {
+            val playlistDao = database.playlistDao()
+            saveImage(playlist.id, playlist.coverUri)
+            playlistDao.updatePlaylist(
+                playlistId = playlist.id,
+                name = playlist.name,
+                description = playlist.description,
+            )
+            val playlist = playlistDao.getPlaylistById(playlist.id)
+            playlist?.let {
+                playlistConverter.map(it)
+            }
         }
-        playlistDao.updatePlaylist(
-            playlistId = playlist.id,
-            name = playlist.name,
-            description = playlist.description,
-        )
-        return path
     }
 }

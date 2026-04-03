@@ -14,6 +14,10 @@ class PlaylistInteractorImpl(
     override suspend fun getPlaylists(): List<Playlist> =
         playlistRepository.getPlaylists()
 
+    override suspend fun getPlaylistById(id: Int): Playlist? =
+        playlistRepository.getPlaylistById(id)
+
+
     override suspend fun addTrackToPlaylist(track: Track, playlistId: Int): List<Playlist>? =
         playlistRepository.addTrackToPlaylist(track, playlistId)
 
@@ -33,6 +37,6 @@ class PlaylistInteractorImpl(
         playlistRepository.removePlaylist(playlistId)
     }
 
-    override suspend fun updatePlaylist(playlist: EditPlaylistModel): String =
+    override suspend fun updatePlaylist(playlist: EditPlaylistModel): Playlist? =
         playlistRepository.updatePlaylist(playlist)
 }

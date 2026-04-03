@@ -19,7 +19,6 @@ import com.practicum.playlistmaker.PlaylistUtil
 import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.FragmentEditPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
-import com.practicum.playlistmaker.domain.models.EditPlaylistModel
 import com.practicum.playlistmaker.ui.media.viewmodel.EditPlaylistViewModel
 import com.practicum.playlistmaker.ui.root.RootActivity
 import kotlinx.coroutines.delay
@@ -44,23 +43,15 @@ class EditPlaylistFragment : Fragment() {
     private var imageUri: Uri? = null
     private var isClickAllowed = true
     private val permissionHelper: PermissionHelper = PermissionHelper(this)
-    private var editablePlaylist: EditPlaylistModel? = null
+    private var playlistId: Int? = null
 
     companion object {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
 
-        private const val ARGS_COVER_ID = "playlist.id"
-        private const val ARGS_COVER_URI = "playlist.coverUri"
-        private const val ARGS_PLAYLIST_NAME = "playlist.name"
-        private const val ARGS_PLAYLIST_DESCRIPTION = "playlist.description"
-        private const val ARGS_TRACK_AMOUNT = "playlist.trackAmount"
+        private const val ARGS_PLAYLIST_ID = "playlistId"
 
-        fun createArgs(playlist: Playlist) = Bundle().apply {
-            putInt(ARGS_COVER_ID, playlist.id)
-            putString(ARGS_COVER_URI, playlist.coverUri)
-            putString(ARGS_PLAYLIST_NAME, playlist.name)
-            putString(ARGS_PLAYLIST_DESCRIPTION, playlist.description)
-            putInt(ARGS_TRACK_AMOUNT, playlist.tracksAmount)
+        fun createArgs(playlistId: Int) = Bundle().apply {
+            putInt(ARGS_PLAYLIST_ID, playlistId)
         }
     }
 
@@ -74,45 +65,37 @@ class EditPlaylistFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setData()
+        getEditablePlaylistId()
         setListeners()
         setUpObserver()
     }
 
     private fun setUpObserver() {
-        viewModel.observeUri().observe(viewLifecycleOwner) { uri ->
-            uri?.let {
-                sendUpdateToPlaylistFragment(it)
+        viewModel.observeState().observe(viewLifecycleOwner) { playlist ->
+            playlist?.let {
+                setData(it)
             }
         }
     }
 
-    private fun getEditablePlaylist(): EditPlaylistModel? {
-        val arguments = arguments
-        return arguments?.let {EditPlaylistModel(
-            arguments.getInt(ARGS_COVER_ID),
-            arguments.getString(ARGS_COVER_URI)?.toUri(),
-            arguments.getString(ARGS_PLAYLIST_NAME) ?: "",
-            arguments.getString(ARGS_PLAYLIST_DESCRIPTION) ?: "",
-            arguments.getInt(ARGS_TRACK_AMOUNT),
-        )}
+    private fun getEditablePlaylistId() {
+        playlistId = arguments?.getInt(ARGS_PLAYLIST_ID)
+        val playlistId = playlistId
+        playlistId?.let {
+            viewModel.getPlaylist(it)
+        }
     }
 
-    private fun setData() {
-        editablePlaylist = getEditablePlaylist()
-
-        val playlistData = editablePlaylist
-        playlistData?.let {
-            with(binding) {
-                playlistCover.setImageURI(playlistData.coverUri)
-                if (playlistData.coverUri.toString().isNotEmpty()) playlistCoverImage.isVisible = false
-                playlistNameEt.setText(playlistData.name)
-                playlistDescriptionEt.setText(playlistData.description)
-                toolbarTitle.text = getString(R.string.edit_playlist)
-                createPlaylistButton.apply {
-                    text = getString(R.string.save_playlist)
-                    isEnabled = playlistNameEt.text?.isNotBlank() == true
-                }
+    private fun setData(playlist: Playlist) {
+        with(binding) {
+            playlistCover.setImageURI(playlist.coverUri.toUri())
+            if (playlist.coverUri.isNotEmpty()) playlistCoverImage.isVisible = false
+            playlistNameEt.setText(playlist.name)
+            playlistDescriptionEt.setText(playlist.description)
+            toolbarTitle.text = getString(R.string.edit_playlist)
+            createPlaylistButton.apply {
+                text = getString(R.string.save_playlist)
+                isEnabled = playlistNameEt.text?.isNotBlank() == true
             }
         }
     }
@@ -129,8 +112,8 @@ class EditPlaylistFragment : Fragment() {
                 lifecycleScope.launch {
                     val name = playlistNameEt.text.toString()
                     val description = playlistDescriptionEt.text.toString()
-                    val editablePlaylist = editablePlaylist
-                    if (editablePlaylist == null) {
+                    val playlistId = playlistId
+                    if (playlistId == null) {
                         viewModel.createPlaylist(
                             name = name,
                             description = description,
@@ -146,7 +129,7 @@ class EditPlaylistFragment : Fragment() {
                         findNavController().popBackStack()
                     } else {
                         viewModel.updatePlaylist(
-                            id = editablePlaylist.id,
+                            id = playlistId,
                             name = name,
                             description = description,
                             coverUri = imageUri,
@@ -158,6 +141,7 @@ class EditPlaylistFragment : Fragment() {
                                 name,
                             )
                         )
+                        sendUpdateToPlaylistFragment(playlistId)
                     }
                 }
             }
@@ -173,22 +157,14 @@ class EditPlaylistFragment : Fragment() {
         }
     }
 
-    private fun sendUpdateToPlaylistFragment(coverUri: String) {
-        val editablePlaylist = editablePlaylist
-        if (editablePlaylist == null) return
+    private fun sendUpdateToPlaylistFragment(playlistId: Int) {
         val navOptions = NavOptions.Builder()
             .setPopUpTo(R.id.playlistFragment, inclusive = true)
             .build()
-        val name = binding.playlistNameEt.text.toString()
-        val description = binding.playlistDescriptionEt.text.toString()
         findNavController().navigate(
             R.id.action_editPlaylistFragment_to_playlistFragment,
             PlaylistFragment.createArgs(
-                id = editablePlaylist.id,
-                name = name,
-                description = description,
-                coverUri = coverUri,
-                tracksAmount = editablePlaylist.tracksAmount,
+                playlistId
             ),
             navOptions,
         )
@@ -206,7 +182,7 @@ class EditPlaylistFragment : Fragment() {
     }
 
     private fun handleAbortAttempt() {
-        if (hasUnsavedChanges() && editablePlaylist == null) {
+        if (hasUnsavedChanges() && playlistId == null) {
             PlaylistUtil.showAlertDialog(
                 context = rootActivity,
                 title = getString(R.string.abort_playlist_creation_question),

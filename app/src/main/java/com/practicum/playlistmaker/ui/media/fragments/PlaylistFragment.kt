@@ -37,36 +37,15 @@ class PlaylistFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: TrackAdapter
 
-    private lateinit var playlist: Playlist
+    private var playlistId: Int = -1
     private lateinit var playlistBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     companion object {
 
         private const val ARGS_PLAYLIST_ID = "playlist.id"
-        private const val ARGS_PLAYLIST_NAME = "playlist.name"
-        private const val ARGS_PLAYLIST_DESCRIPTION = "playlist.description"
-        private const val ARGS_PLAYLIST_COVER = "playlist.cover"
-        private const val ARGS_TRACK_AMOUNT = "playlist.trackAmount"
 
-        fun createArgs(playlist: Playlist) = Bundle().apply {
-            putInt(ARGS_PLAYLIST_ID, playlist.id)
-            putString(ARGS_PLAYLIST_NAME, playlist.name)
-            putString(ARGS_PLAYLIST_DESCRIPTION, playlist.description)
-            putString(ARGS_PLAYLIST_COVER, playlist.coverUri)
-            putInt(ARGS_TRACK_AMOUNT, playlist.tracksAmount)
-        }
-        fun createArgs(
-            id: Int,
-            name: String,
-            description: String,
-            coverUri: String,
-            tracksAmount: Int,
-        ) = Bundle().apply {
-            putInt(ARGS_PLAYLIST_ID, id)
-            putString(ARGS_PLAYLIST_NAME, name)
-            putString(ARGS_PLAYLIST_DESCRIPTION, description)
-            putString(ARGS_PLAYLIST_COVER, coverUri)
-            putInt(ARGS_TRACK_AMOUNT, tracksAmount)
+        fun createArgs(playlistId: Int) = Bundle().apply {
+            putInt(ARGS_PLAYLIST_ID, playlistId)
         }
     }
 
@@ -81,16 +60,20 @@ class PlaylistFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configureRecycler()
-        setData()
-        setupMoreBottomSheet()
+        getPlaylistId()
         setOnClickListeners()
+        loadPlaylist()
         setViewModelObserver()
         getPlaylistTracks()
     }
 
-    private fun setData() {
-        playlist = getPlaylist()
+    private fun getPlaylistId() {
+        playlistId = arguments?.getInt(ARGS_PLAYLIST_ID) ?: 0
+    }
 
+    private fun setData(
+        playlist: Playlist
+    ) {
         with(binding) {
             playlistName.text = playlist.name
             playlistDescription.text = playlist.description
@@ -116,17 +99,11 @@ class PlaylistFragment : Fragment() {
         )
     }
 
-    private fun getPlaylist(): Playlist {
-        return Playlist(
-            arguments?.getInt(ARGS_PLAYLIST_ID) ?: 0,
-            arguments?.getString(ARGS_PLAYLIST_NAME) ?: "",
-            arguments?.getString(ARGS_PLAYLIST_DESCRIPTION) ?: "",
-            arguments?.getString(ARGS_PLAYLIST_COVER) ?: "",
-            arguments?.getInt(ARGS_TRACK_AMOUNT) ?: 0,
-        )
+    private fun loadPlaylist() {
+        viewModel.getPlaylist(playlistId)
     }
 
-    private fun setupMoreBottomSheet() {
+    private fun setupMoreBottomSheet(playlist: Playlist) {
         with(binding) {
             playlistMoreBottomSheet.isClickable = true
             currentPlaylistItem.apply {
@@ -183,7 +160,7 @@ class PlaylistFragment : Fragment() {
                     negativeBtnTitle = getString(R.string.no),
                     positiveBtnTitle = getString(R.string.yes),
                     negativeBtnAction = {},
-                    positiveBtnAction = { viewModel.removeTrackFromPlaylist(track.trackId, playlist.id) },
+                    positiveBtnAction = { viewModel.removeTrackFromPlaylist(track.trackId, playlistId) },
                 )
             }
         )
@@ -215,18 +192,18 @@ class PlaylistFragment : Fragment() {
             editPlaylist.itemMorePlaylistLayout.setOnClickListener {
                 findNavController().navigate(
                     R.id.action_playlistFragment_to_editPlaylistFragment,
-                    EditPlaylistFragment.createArgs(playlist)
+                    EditPlaylistFragment.createArgs(playlistId)
                 )
             }
             deletePlaylist.itemMorePlaylistLayout.setOnClickListener {
                 playlistBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 PlaylistUtil.showAlertDialog(
                     context = rootActivity,
-                    title = getString(R.string.delete_playlist_confirmation, playlist.name),
+                    title = getString(R.string.delete_playlist_confirmation, binding.playlistName.text),
                     negativeBtnTitle = getString(R.string.no),
                     positiveBtnTitle = getString(R.string.yes),
                     negativeBtnAction = {},
-                    positiveBtnAction = { viewModel.removePlaylist(playlist.id) },
+                    positiveBtnAction = { viewModel.removePlaylist(playlistId) },
                 )
             }
         }
@@ -241,6 +218,10 @@ class PlaylistFragment : Fragment() {
 
     private fun setViewModelObserver() {
         viewModel.observePlaylistState().observe(viewLifecycleOwner) { playlistState ->
+            playlistState.data?.let {
+                setData(it)
+                setupMoreBottomSheet(it)
+            }
             playlistState.tracks?.let {
                 updateRecycler(playlistState.tracks)
                 configurePlaceholderVisibility()
@@ -268,7 +249,7 @@ class PlaylistFragment : Fragment() {
     }
 
     private fun getPlaylistTracks() {
-        viewModel.getTracksByPlaylist(playlist.id)
+        viewModel.getTracksByPlaylist(playlistId)
     }
 
     private fun configurePlaceholderVisibility() {

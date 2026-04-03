@@ -60,7 +60,7 @@ class PlaylistsFragment : Fragment() {
             rootActivity.setBottomBarVisibility(false)
             findNavController().navigate(
                 R.id.action_mediaFragment_to_playlistFragment,
-                PlaylistFragment.createArgs(playlist),
+                PlaylistFragment.createArgs(playlist.id),
             )
         }
 
