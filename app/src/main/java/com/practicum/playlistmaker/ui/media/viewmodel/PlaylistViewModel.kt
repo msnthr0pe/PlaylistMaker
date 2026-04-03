@@ -9,8 +9,6 @@ import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.playlists.PlaylistInteractor
 import com.practicum.playlistmaker.ui.media.models.PlaylistState
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class PlaylistViewModel(
     private val playlistInteractor: PlaylistInteractor
@@ -72,6 +70,8 @@ class PlaylistViewModel(
 
     fun buildStringForSharing() {
         sharingString = buildString {
+            appendLine("${data?.name}")
+            if (data?.description?.isNotEmpty() == true) appendLine("${data?.description}")
             appendLine("${tracks?.size ?: 0} треков")
             tracks?.let { tracks ->
                 tracks.forEachIndexed { index, track ->
@@ -88,7 +88,7 @@ class PlaylistViewModel(
     }
 
     private fun convertToMinutes(millis: Long) =
-        SimpleDateFormat("mm", Locale.getDefault()).format(millis).toInt()
+        (millis / 60_000L).toInt()
 
     private fun postState() {
         playlistState.postValue(

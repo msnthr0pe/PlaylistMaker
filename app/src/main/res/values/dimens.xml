@@ -6,7 +6,7 @@
     <dimen name="snackbar_bottombar_margin">70dp</dimen>
     <dimen name="giant_margin">64dp</dimen>
     <dimen name="playlist_cover_margin">46dp</dimen>
-    <dimen name="playlist_cover_text_margin">42dp</dimen>
+    <dimen name="playlist_cover_text_margin">34dp</dimen>
     <dimen name="large_margin">32dp</dimen>
     <dimen name="standart_player_margin">24dp</dimen>
     <dimen name="vertical_settings_margin">21dp</dimen>
