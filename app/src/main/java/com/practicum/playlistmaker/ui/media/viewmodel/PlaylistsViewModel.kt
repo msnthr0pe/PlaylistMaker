@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.domain.models.Track
 import com.practicum.playlistmaker.domain.playlists.PlaylistInteractor
 import com.practicum.playlistmaker.ui.media.models.PlayerEvent
 import com.practicum.playlistmaker.ui.media.models.PlaylistsState
@@ -33,11 +34,11 @@ class PlaylistsViewModel(
         }
     }
 
-    fun addToPlaylist(trackId: Long, playlist: Playlist) {
+    fun addToPlaylist(track: Track, playlist: Playlist) {
         viewModelScope.launch {
             val trackIdsInPlaylist = playlistInteractor.getTrackIdsInPlaylist(playlist.id)
-            if (trackIdsInPlaylist?.contains(trackId) == false) {
-                playlists = playlistInteractor.addTrackToPlaylist(trackId, playlist.id) ?: playlists
+            if (trackIdsInPlaylist?.contains(track.trackId) == false) {
+                playlists = playlistInteractor.addTrackToPlaylist(track, playlist.id) ?: playlists
                 playerEvent = PlayerEvent.TrackAddSuccess(playlist.name)
             } else {
                 playerEvent = PlayerEvent.TrackAddDuplicate(playlist.name)

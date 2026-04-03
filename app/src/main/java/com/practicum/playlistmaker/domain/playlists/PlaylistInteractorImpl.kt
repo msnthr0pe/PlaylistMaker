@@ -1,7 +1,9 @@
 package com.practicum.playlistmaker.domain.playlists
 
 import android.net.Uri
+import com.practicum.playlistmaker.domain.models.EditPlaylistModel
 import com.practicum.playlistmaker.domain.models.Playlist
+import com.practicum.playlistmaker.domain.models.Track
 
 class PlaylistInteractorImpl(
     private val playlistRepository: PlaylistRepository,
@@ -12,9 +14,29 @@ class PlaylistInteractorImpl(
     override suspend fun getPlaylists(): List<Playlist> =
         playlistRepository.getPlaylists()
 
-    override suspend fun addTrackToPlaylist(trackId: Long, playlistId: Int): List<Playlist>? =
-        playlistRepository.addTrackToPlaylist(trackId, playlistId)
+    override suspend fun getPlaylistById(id: Int): Playlist? =
+        playlistRepository.getPlaylistById(id)
+
+
+    override suspend fun addTrackToPlaylist(track: Track, playlistId: Int): List<Playlist>? =
+        playlistRepository.addTrackToPlaylist(track, playlistId)
 
     override suspend fun getTrackIdsInPlaylist(playlistId: Int): List<Long>? =
         playlistRepository.getTrackIdsInPlaylist(playlistId)
+
+    override suspend fun getTracksInPlaylist(playlistId: Int): List<Track> =
+        playlistRepository.getTracksInPlaylist(playlistId)
+
+    override suspend fun removeTrackFromPlaylistAndGet(
+        trackId: Long,
+        playlistId: Int,
+    ): List<Track> =
+        playlistRepository.removeTrackFromPlaylistAndGet(trackId, playlistId)
+
+    override suspend fun removePlaylist(playlistId: Int) {
+        playlistRepository.removePlaylist(playlistId)
+    }
+
+    override suspend fun updatePlaylist(playlist: EditPlaylistModel): Playlist? =
+        playlistRepository.updatePlaylist(playlist)
 }

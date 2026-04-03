@@ -179,7 +179,9 @@ class SearchFragment : Fragment() {
         recycler = binding.searchRecycler
 
         viewModel.updateCurrentHistory()
-        adapter = TrackAdapter(emptyList()) {
+        adapter = TrackAdapter(
+            tracks = emptyList(),
+            onItemClick = {
             if (clickDebounce()) {
                 viewModel.addToHistory(it)
                 viewModel.addHistory()
@@ -190,7 +192,7 @@ class SearchFragment : Fragment() {
                     AudioPlayerFragment.createArgs(it))
 
             }
-        }
+        })
         recycler.adapter = adapter
         binding.clearHistoryBtn.setOnClickListener {
             viewModel.addHistory(arrayListOf())

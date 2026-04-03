@@ -11,7 +11,7 @@ import com.practicum.playlistmaker.R
 import com.practicum.playlistmaker.databinding.ItemPlaylistBinding
 import com.practicum.playlistmaker.domain.models.Playlist
 
-class PlaylistAdapter(var playlists: List<Playlist>) : RecyclerView.Adapter<PlaylistAdapter.SearchTrackViewHolder>() {
+class PlaylistAdapter(var playlists: List<Playlist>, val onItemClick: (Playlist) -> Unit) : RecyclerView.Adapter<PlaylistAdapter.SearchTrackViewHolder>() {
 
     private lateinit var binding: ItemPlaylistBinding
 
@@ -31,6 +31,9 @@ class PlaylistAdapter(var playlists: List<Playlist>) : RecyclerView.Adapter<Play
                 image.setImageURI(playlist.coverUri.toUri())
             } else {
                 image.setImageResource(R.drawable.ic_placeholder)
+            }
+            itemView.setOnClickListener {
+                onItemClick(playlist)
             }
         }
 

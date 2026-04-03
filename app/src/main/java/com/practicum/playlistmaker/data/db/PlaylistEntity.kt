@@ -10,7 +10,6 @@ data class PlaylistEntity (
     val name: String,
     val description: String,
     val coverUri: String,
-    val trackIds: String,
     val tracksAmount: Int,
     val createdAt: Long = System.currentTimeMillis(),
 )

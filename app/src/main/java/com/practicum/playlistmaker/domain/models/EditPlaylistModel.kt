@@ -1,9 +1,11 @@
 package com.practicum.playlistmaker.domain.models
 
-data class Playlist(
+import android.net.Uri
+
+data class EditPlaylistModel(
     val id: Int,
+    val coverUri: Uri?,
     val name: String,
     val description: String,
-    val coverUri: String,
-    val tracksAmount: Int,
+    val tracksAmount: Int = 0,
 )
