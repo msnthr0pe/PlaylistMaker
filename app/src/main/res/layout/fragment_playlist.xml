@@ -12,12 +12,23 @@
         android:background="@color/yp_light_gray"
         tools:context=".ui.media.fragments.PlaylistFragment">
 
+        <View
+            android:id="@+id/white_cover_background"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
         <ImageView
             android:id="@+id/playlist_cover"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_placeholder"
+            android:layout_margin="@dimen/playlist_cover_margin"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -47,12 +58,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/medium_margin"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="@dimen/playlist_cover_text_margin"
             android:textColor="@color/yp_black"
             android:text="@string/default_value"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/playlist_cover" />
+            app:layout_constraintTop_toBottomOf="@+id/white_cover_background" />
 
         <TextView
             android:id="@+id/playlist_description"
@@ -195,7 +206,7 @@
         android:background="@drawable/bottom_sheet_background"
         android:orientation="vertical"
         app:behavior_hideable="true"
-        android:maxHeight="400dp"
+        android:maxHeight="360dp"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <View

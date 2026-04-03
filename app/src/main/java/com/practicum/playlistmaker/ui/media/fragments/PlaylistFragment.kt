@@ -1,6 +1,7 @@
 package com.practicum.playlistmaker.ui.media.fragments
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -78,7 +79,12 @@ class PlaylistFragment : Fragment() {
             playlistName.text = playlist.name
             playlistDescription.text = playlist.description
             playlistDescription.isVisible = playlist.description.isNotEmpty()
-            if (playlist.coverUri.isNotEmpty()) playlistCover.setImageURI(playlist.coverUri.toUri())
+            if (playlist.coverUri.isNotEmpty()){
+                playlistCover.setImageURI(playlist.coverUri.toUri())
+                whiteCoverBackground.setBackgroundColor(Color.WHITE)
+            } else {
+                whiteCoverBackground.setBackgroundColor(Color.TRANSPARENT)
+            }
             binding.playlistTrackCount.updateTrackCount(playlist.tracksAmount)
         }
     }
@@ -121,13 +127,10 @@ class PlaylistFragment : Fragment() {
 
         with(playlistBottomSheetBehavior) {
             peekHeight = 0
-
-            binding.scrim.setOnClickListener {
-                state = BottomSheetBehavior.STATE_HIDDEN
-            }
-            state = BottomSheetBehavior.STATE_HIDDEN
-
             skipCollapsed = true
+
+            binding.scrim.setOnClickListener { state = BottomSheetBehavior.STATE_HIDDEN }
+            state = BottomSheetBehavior.STATE_HIDDEN
 
             addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
@@ -140,6 +143,36 @@ class PlaylistFragment : Fragment() {
                     binding.scrim.alpha = 0.6f * slideOffset.coerceIn(0f, 1f)
                 }
             })
+        }
+
+        binding.tracksBottomSheet.post {
+            val sheet = binding.tracksBottomSheet
+            val behavior = BottomSheetBehavior.from(sheet)
+
+            val limitView = binding.sharePlaylist
+            val parent = sheet.parent as View
+
+            val gapPx = (sheet.resources.getDimension(R.dimen.standart_player_margin)).toInt()
+
+            val limitLoc = IntArray(2)
+            val parentLoc = IntArray(2)
+            limitView.getLocationInWindow(limitLoc)
+            parent.getLocationInWindow(parentLoc)
+
+            val limitBottomInWindow = limitLoc[1] + limitView.height
+            val limitBottomInParent = limitBottomInWindow - parentLoc[1]
+
+            val maxTopAllowed = (limitBottomInParent + gapPx).coerceAtLeast(0)
+
+            val minPeekHeight = (parent.height - maxTopAllowed).coerceAtLeast(0)
+
+            behavior.peekHeight = minPeekHeight
+            behavior.skipCollapsed = false
+            behavior.isHideable = false
+
+            if (behavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
         }
     }
 
